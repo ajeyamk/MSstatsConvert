@@ -4,5 +4,7 @@ language: R
 cache: packages
 warnings_are_errors: false
 
+[skip travis] Update README
+
 after_success:
   - Rscript -e 'covr::codecov()'
