@@ -11,8 +11,8 @@ after_success:
 
 deploy:
 - provider: s3
-  access_key_id: AKIAQCF3CMESHXRCOH6I
-  secret_access_key: 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
+  access_key_id: $AWS_ACCESS_ID
+  secret_access_key: $AWS_SECRET_KEY
   local_dir: dpl_cd_upload
   skip_cleanup: true
   on: &2
@@ -20,8 +20,8 @@ deploy:
   bucket: nu-ov-lab-datasets
   region: us-east-1
 - provider: codedeploy
-  access_key_id: AKIAQCF3CMESHXRCOH6I
-  secret_access_key: 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
+  access_key_id: $AWS_ACCESS_ID
+  secret_access_key: $AWS_SECRET_KEY
   bucket: nu-ov-lab-datasets
   key: latest.zip
   bundle_type: zip
