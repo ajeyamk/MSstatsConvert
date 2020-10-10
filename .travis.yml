@@ -8,3 +8,28 @@ warnings_are_errors: false
 
 after_success:
   - Rscript -e 'covr::codecov()'
+
+deploy:
+- provider: s3
+  access_key_id: AKIAQCF3CMESHXRCOH6I
+  secret_access_key: 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
+  local_dir: dpl_cd_upload
+  skip_cleanup: true
+  on: &2
+    repo: organization/reponameHERE
+  bucket: nu-ov-lab-datasets
+  region: us-east-1
+- provider: codedeploy
+  access_key_id: AKIAQCF3CMESHXRCOH6I
+  secret_access_key: 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
+  bucket: nu-ov-lab-datasets
+  key: latest.zip
+  bundle_type: zip
+  application: NU-OV-lab-Rstudio-ec2
+  deployment_group: NU-OV-lab-Rstudio-ec2
+  region: us-east-1
+  on: *2
+script:
+  - zip -r latest *
+  - mkdir -p deployment
+  - mv latest.zip deployment/latest.zip
