@@ -13,10 +13,10 @@ deploy:
 - provider: s3
   access_key_id: $AWS_ACCESS_ID
   secret_access_key: $AWS_SECRET_KEY
-  local_dir: dpl_cd_upload
+  local_dir: deployment
   skip_cleanup: true
   on: &2
-    repo: organization/reponameHERE
+    repo: ajeyamk/MSstatsConvert
   bucket: nu-ov-lab-datasets
   region: us-east-1
 - provider: codedeploy
