@@ -13,6 +13,7 @@ deploy:
 - provider: s3
   access_key_id: $AWS_ACCESS_ID
   secret_access_key: $AWS_SECRET_KEY
+  local_dir: deployment
   skip_cleanup: true
   on: &2
     repo: ajeyamk/MSstatsConvert
