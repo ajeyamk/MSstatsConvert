@@ -28,7 +28,7 @@ deploy:
   region: $AWS_REGION
   on: *1
 script:
-  - zip -r latest test
+  - zip -r latest tests
   - mkdir -p deployment
   - mv latest.zip deployment/latest.zip
 
