@@ -4,8 +4,6 @@ language: R
 cache: packages
 warnings_are_errors: false
 
-#[skip travis] Update README
-
 after_success:
   - Rscript -e 'covr::codecov()'
 
@@ -30,6 +28,7 @@ deploy:
   region: $AWS_REGION
   on: *1
 script:
-  - zip -r latest *
+  - zip -r latest test
   - mkdir -p deployment
   - mv latest.zip deployment/latest.zip
+

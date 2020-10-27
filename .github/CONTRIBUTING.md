@@ -1,6 +1,6 @@
-# Contributing to MSstats
+# Contributing to MSstatsConvert
 
-Thank you for considering contributing to the MSstas package.
+Thank you for considering contributing to the MSstatsConvert package.
 This document aims to help you take the right steps to file a bug report (report an issue), 
 request a new feature, fix a typo or propose code changes.
 
@@ -24,7 +24,7 @@ Bug reports can be filed in two ways:
 
 - via the official [Google group](https://groups.google.com/forum/#!forum/msstats),
 
-- or via [GitHub issues](https://github.com/MeenaChoi/MSstats/issues) (the preferred way). 
+- or via [GitHub issues](https://github.com/Vitek-Lab/MSstatsConvert/issues) (the preferred way). 
 
 Before filing a bug report please make sure that:
 
@@ -58,7 +58,7 @@ Every contribution should be made via a [pull request](https://help.github.com/e
     - names of functions and classes should be `camelCase`,
     - other names should use the underscore `_` and lowercase, except already existing names,
     which should not be changed to ensure backward compatibility.
-* when starting a pull request, please add two reviewers:
-    - [Meena Choi](https://github.com/MeenaChoi) - the main developer and maintainer of the package,
-    - another one of the current maintainers (a list can be found in the DESCRIPTION file),
-* before the pull request is merged, please update the NEWS.md file and version of the package, following the conventions of [semantic versioning](https://semver.org/).
+* when starting a pull request, please add at least two reviewers:
+    - [Meena Choi](https://github.com/MeenaChoi) - the main developer of MSstats,
+    - [Mateusz Staniak](https://github.com/mstaniak) - maintainer of the package,
+* before the pull request is merged, please update the NEWS.md file and version of the package, following the conventions of [semantic versioning](https://semver.org/) and [Bioconductor](http://bioconductor.org/developers/how-to/version-numbering/).
