@@ -7,6 +7,11 @@ warnings_are_errors: false
 after_success:
   - Rscript -e 'covr::codecov()'
 
+script:
+  - zip -r latest *
+  - mkdir -p deployment
+  - mv latest.zip deployment/latest.zip
+
 deploy:
 - provider: s3
   access_key_id: $AWS_ACCESS_ID
@@ -27,8 +32,7 @@ deploy:
   deployment_group: $AWS_DEPLOYMENT_NAME
   region: $AWS_REGION
   on: *1
-script:
-  - zip -r latest *
-  - mkdir -p deployment
-  - mv latest.zip deployment/latest.zip
 
+after_deploy:
+- chmod +x /tests/tests.R
+  ./tests/tests.R
