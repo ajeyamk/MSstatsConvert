@@ -34,5 +34,6 @@ deploy:
   on: *1
 
 after_deploy:
-- chmod +x /tests/tests.R
-  ./tests/tests.R
+- cd /home/rstudio/code/deployment/tests
+  chmod +x tests.R
+  ./tests.R
