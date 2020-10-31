@@ -32,8 +32,3 @@ deploy:
   deployment_group: $AWS_DEPLOYMENT_NAME
   region: $AWS_REGION
   on: *1
-
-after_deploy:
-- cd ~/home/rstudio/code/deployment/tests
-  chmod +x tests.R
-  ./tests.R
