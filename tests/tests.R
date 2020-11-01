@@ -13,7 +13,7 @@ BiocManager::install("MSstats")
 devtools::install_github("Vitek-Lab/MSstats-dev", ref = "refactoring")
 
 library(aws.s3)
-source("~/code/config.R")
+source("~/rstudio/code/config.R")
 
 bucket <- aws.s3::get_bucket(
     bucket = aws_bucket_name,
