@@ -2,8 +2,12 @@
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
+
 if (!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
+
+if (!requireNamespace("aws.s3", quietly = TRUE))
+    install.packages("aws.s3", repos = "https://cloud.R-project.org")
 
 BiocManager::install("MSstats")
 devtools::install_github("Vitek-Lab/MSstats-dev", ref = "refactoring")
