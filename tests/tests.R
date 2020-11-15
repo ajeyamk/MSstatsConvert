@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 
+library(paws)
 #initialise s3 object
 s3 <- paws::s3()
 # quick smoke test to check bucket contents
