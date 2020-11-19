@@ -31,6 +31,6 @@ deploy:
   key: latest.zip
   bundle_type: zip
   application: $AWS_MASTER_DEPLOYMENT_NAME
-  deployment_group: $AWS_MASTER_DEPLOYMENT_NAME
+  deployment_group: AWS_MASTER_DEPLOYMENT_GROUP_NAME
   region: $AWS_REGION
   on: *1
