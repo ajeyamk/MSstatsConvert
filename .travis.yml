@@ -16,21 +16,21 @@ script:
 
 deploy:
 - provider: s3
-  access_key_id: $AWS_ACCESS_ID
-  secret_access_key: $AWS_SECRET_KEY
+  access_key_id: $AWS_MASTER_ACCESS_ID
+  secret_access_key: $AWS_MASTER_SECRET_KEY
   local_dir: deployment
   skip_cleanup: true
   on: &2
     repo: ajeyamk/MSstatsConvert
-  bucket: $AWS_S3_BUCKET
+  bucket: $AWS_MASTER_S3_BUCKET
   region: $AWS_REGION
 - provider: codedeploy
-  access_key_id: $AWS_ACCESS_ID
-  secret_access_key: $AWS_SECRET_KEY
-  bucket: $AWS_S3_BUCKET
+  access_key_id: $AWS_MASTER_ACCESS_ID
+  secret_access_key: $AWS_MASTER_SECRET_KEY
+  bucket: $AWS_MASTER_S3_BUCKET
   key: latest.zip
   bundle_type: zip
-  application: $AWS_DEPLOYMENT_NAME
-  deployment_group: $AWS_DEPLOYMENT_NAME
+  application: $AWS_MASTER_DEPLOYMENT_NAME
+  deployment_group: $AWS_MASTER_DEPLOYMENT_NAME
   region: $AWS_REGION
   on: *1

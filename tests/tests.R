@@ -1,29 +1,22 @@
 #!/usr/bin/env Rscript
-
-library(paws)
+#############################################################
+#load all the config settings/credentials
+source("/home/rstudio/code/config.R")
+#set aws session variables
+Sys.setenv(
+    AWS_ACCESS_KEY_ID = aws_key,
+    AWS_SECRET_ACCESS_KEY = aws_secret,
+    AWS_REGION = aws_region
+)
+############################################################
 #initialise s3 object
 s3 <- paws::s3()
 # quick smoke test to check bucket contents
 s3$list_buckets()
 
-source("/home/rstudio/code/deployment/tests/utils/s3_helper_functions.R")
 # helper functions to read  binary files from s3
-read_bin_files_s3 <- function(bin_file, file_name){
-    writeBin(bin_file, con = file_name)
-    rds_file <- readRDS(file_name)
-    unlink(file_name)
-    return (rds_file)
-}
+source("/home/rstudio/code/deployment/tests/utils/s3_helper_functions.R")
 
-#helper functions to write binary files to s3
-write_bin_files_s3 <- function(r_object, file_name){
-    saveRDS(r_object, file = file_name)
-    # Load the file as a raw binary
-    read_file <- file(file_name, "rb")
-    bin_file <- readBin(read_file, "raw", n = file.size(file_name))
-    unlink(file_name)
-    return(bin_file)
-}
 # `load()` R objects from S3
 frags <- s3$get_object(Bucket = aws_bucket_name, 
                        Key = "Navarro2016_DIA_DIAumpire_input_FragSummary.RDS")
