@@ -11,7 +11,7 @@ merge_dataframes <- function(df1, df2, col_names){
                all.x = T, all.y = T))
 }
 
-generate_csv <- function(dataframes, file_name){
+generate_xlsx <- function(dataframes, file_name){
   write.xlsx(dataframes[[1]], file=file_name, sheetName=dataframes[[1]]$notes, row.names=FALSE)
   for (each_dataframe in dataframes[-1] ){
     write.xlsx(each_dataframe, file=file_name, sheetName=each_dataframe$notes, append=TRUE, row.names=FALSE)

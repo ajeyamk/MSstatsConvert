@@ -86,7 +86,7 @@ navarro_open_swath_runlevel_data_v4 = as.data.table(navarro_open_swath_output_v4
 
 navarro_open_swath_runlevel_data_v3 <- navarro_open_swath_runlevel_data_v3[, -which(colnames(navarro_open_swath_runlevel_data_v3) %in% c('GROUP', 'SUBJECT_NESTED', 'SUBJECT'))]
 
-navarro_open_swath_runlevel_data_v4 <- as.data.table(anavarro_open_swath_runlevel_data_v4)
+navarro_open_swath_runlevel_data_v4 <- as.data.table(nanavarro_open_swath_runlevel_data_v4)
 navarro_open_swath_runlevel_data_v4[, GROUP := as.factor(as.character(GROUP))]
 navarro_open_swath_runlevel_data_v4[, SUBJECT := as.factor(as.character(SUBJECT))]
 
