@@ -9,8 +9,8 @@ if (!requireNamespace("devtools", quietly = TRUE))
 if (!requireNamespace("paws", quietly = TRUE))
   install.packages("paws")
 
-if (!requireNamespace("data.table", quietly = TRUE))
-  install.packages("data.table")
+if (!requireNamespace("xlsx", quietly = TRUE))
+  install.packages("xlsx")
 
 BiocManager::install("MSstats")
 devtools::install_github("Vitek-Lab/MSstats-dev", ref = "refactoring")
