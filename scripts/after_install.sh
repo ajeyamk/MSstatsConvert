@@ -4,6 +4,9 @@
 cd $source_path/$code_deploy_path/$test_folder
 # execute infra and config files
 sudo chmod +x utils/infra.R
-./utils/infra.R
-sudo chmod +x tests.R
-yes a | ./tests.R
+# to input '1' infinitely when the console prompts for input a
+yes 1 | ./utils/infra.R
+# make the file executable
+sudo chmod +x dataprocess.R
+#& to run in background
+yes a | ./dataprocess.R &

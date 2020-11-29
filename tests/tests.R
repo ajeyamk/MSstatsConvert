@@ -1,26 +1,11 @@
 #!/usr/bin/env Rscript
-#############################################################
-#load all the config settings/credentials
-source("/home/rstudio/code/config.R")
-#set aws session variables
-Sys.setenv(
-    AWS_ACCESS_KEY_ID = aws_key,
-    AWS_SECRET_ACCESS_KEY = aws_secret,
-    AWS_REGION = aws_region
-)
-############################################################
-#initialise s3 object
-s3 <- paws::s3()
-# quick smoke test to check bucket contents
-s3$list_buckets()
 
 # helper functions to read  binary files from s3
 source("/home/rstudio/code/deployment/tests/utils/s3_helper_functions.R")
 
 # `load()` R objects from S3
-frags <- s3$get_object(Bucket = aws_bucket_name, 
-                       Key = "Navarro2016_DIA_DIAumpire_input_FragSummary.RDS")
-frags <- read_bin_files_s3(frags$Body, "frags.rds")
+frags <- get_file_from_s3(s3_file_path = "Navarro2016_DIA_DIAumpire_input_FragSummary.RDS",
+                     local_file_name = "frags.rds")
 
 pepts <- s3$get_object(Bucket = aws_bucket_name,
                        Key = "Navarro2016_DIA_DIAumpire_input_PeptideSummary.RDS")

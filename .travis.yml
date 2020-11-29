@@ -30,7 +30,7 @@ deploy:
   bucket: $AWS_MASTER_S3_BUCKET
   key: latest.zip
   bundle_type: zip
-  application: $AWS_MASTER_DEPLOYMENT_NAME
-  deployment_group: AWS_MASTER_DEPLOYMENT_GROUP_NAME
+  application: $AWS_MASTER_DEPLOYMENT_APPLICATION_NAME
+  deployment_group: $AWS_MASTER_DEPLOYMENT_GROUP_NAME
   region: $AWS_REGION
   on: *1

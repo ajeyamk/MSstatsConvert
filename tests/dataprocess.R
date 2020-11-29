@@ -1,75 +1,82 @@
 library(data.table)
-# Navarro DIAUmpire
-frags = readRDS("./processed_data/DIA-Navarro2016-DIAUmpire/Navarro2016_DIA_DIAumpire_input_FragSummary.RDS")
-pepts = readRDS("./processed_data/DIA-Navarro2016-DIAUmpire/Navarro2016_DIA_DIAumpire_input_PeptideSummary.RDS")
-prots = readRDS("./processed_data/DIA-Navarro2016-DIAUmpire/Navarro2016_DIA_DIAumpire_input_ProtSummary.RDS")
-dia_annot = readRDS("./processed_data/DIA-Navarro2016-DIAUmpire/Navarro2016_DIA_DIAumpire_input_annotation.RDS")
 
-diau = MSstatsdev::DIAUmpiretoMSstatsFormat(frags, pepts, prots, dia_annot)
-saveRDS(diau, "diau_input.RDS")
-# diau_v3 = MSstats::dataProcess(as.data.frame(unclass(diau)), MBimpute = FALSE)
-diau_v3 = MSstats::dataProcess(as.data.frame(unclass(diau)), MBimpute = TRUE)
-saveRDS(diau_v3, "diau_v3_dp.RDS")
-# diau_v4 = MSstatsdev::dataProcess(diau, MBimpute = FALSE)
-diau_v4 = MSstatsdev::dataProcess(diau, MBimpute = TRUE)
-saveRDS(diau_v4, "diau_v4_dp.RDS")
-# Navarro OpenSWATH
-os_input = readRDS("./processed_data/DIA-Navarro2016-OpenSWATH/Navarro2016_DIA_OpenSWATH_input.RDS")
-os_annot = readRDS("./processed_data/DIA-Navarro2016-OpenSWATH/Navarro2016_DIA_OpenSWATH_annotation.RDS")
-os = MSstatsdev::OpenSWATHtoMSstatsFormat(os_input, os_annot)
-saveRDS(os, "os_input.RDS")
-# os_v3 = MSstats::dataProcess(as.data.frame(unclass(os)), MBimpute = FALSE,
-#                              censoredInt = "0")
-os_v3 = MSstats::dataProcess(as.data.frame(unclass(os)), MBimpute = TRUE,
-                             censoredInt = "0")
-saveRDS(os_v3, "os_v3_dp.RDS")
-# os_v4 = MSstatsdev::dataProcess(os, MBimpute = FALSE, censoredInt = "0")
-os_v4 = MSstatsdev::dataProcess(os, MBimpute = TRUE, censoredInt = "0")
-saveRDS(os_v4, "os_v4_dp.RDS")
-# Navarro Skyline
-sl_input = readRDS("./processed_data/DIA-Navarro2016-Skyline/Navarro2016_DIA_Skyline_input.RDS")
-# sl_input = sl_input[sl_input$ProteinName %in% c("1/sp|C8ZAS4|SEC11_YEAS8", "4/sp|P00330|ADH1_YEAST/tr|D3UEP0|D3UEP0_YEAS8/tr|C8ZFH1|C8ZFH1_YEAS8/tr|C8ZHN0|C8ZHN0_YEAS8"), ]
-sl_annot = readRDS("./processed_data/DIA-Navarro2016-Skyline/Navarro2016_DIA_Skyline_annotation.RDS")
-sl = MSstatsdev::SkylinetoMSstatsFormat(sl_input, sl_annot)
-saveRDS(sl, "sl_input.RDS")
-# sl_v3 = MSstats::dataProcess(as.data.frame(unclass(sl)), MBimpute = FALSE,
-#                              censoredInt = "0")
-sl_v3 = MSstats::dataProcess(as.data.frame(unclass(sl)), MBimpute = TRUE,
-                             censoredInt = "0")
-saveRDS(sl_v3, "sl_v3_dp.RDS")
-# sl_v4 = MSstatsdev::dataProcess(sl, MBimpute = FALSE, censoredInt = "0")
-sl_v4 = MSstatsdev::dataProcess(sl, MBimpute = TRUE, censoredInt = "0")
-saveRDS(sl_v4, "sl_v4_dp.RDS")
-# Navarro Spectronaut
-sn_input = readRDS("./processed_data/DIA-Navarro2016-Spectronaut/Navarro2016_DIA_Spectronaut_input.RDS")
-sn_annot = readRDS("./processed_data/DIA-Navarro2016-Spectronaut/Navarro2016_DIA_Spectronaut_annotation.RDS")
-sn = MSstatsdev::SpectronauttoMSstatsFormat(sn_input, sn_annot)
-saveRDS(sn, "sn_input.RDS")
-# sn_v3 = MSstats::dataProcess(as.data.frame(unclass(sn)), MBimpute = FALSE,
-#                              censoredInt = "0")
-sn_v3 = MSstats::dataProcess(as.data.frame(unclass(sn)), MBimpute = TRUE,
-                             censoredInt = "0")
-saveRDS(sn_v3, "sn_v3_dp.RDS")
-# sn_v4 = MSstatsdev::dataProcess(sn, MBimpute = FALSE, censoredInt = "0")
-sn_v4 = MSstatsdev::dataProcess(sn, MBimpute = TRUE, censoredInt = "0")
-saveRDS(sn_v4, "sn_v4_dp.RDS")
-# sn = MSstatsdev::SpectronauttoMSstatsFormat(sn_input[sn_input$PG.ProteinAccessions %in% unique(sn_input$PG.ProteinAccessions)[1:1000], ], sn_annot)
-# sn_df = as.data.frame(unclass(sn))
-# microbenchmark::microbenchmark(
-#     old = MSstats::dataProcess(sn_df, MBimpute = FALSE),
-#     new = MSstatsdev::dataProcess(sn, MBimpute = FALSE),
-#     times = 3
-# )
-#
-# library(MSstatsdev)
-# input = MSstatsPrepareForDataProcess(as.data.frame(unclass(sn)), 2)
-# # Normalization, Imputation and feature selection ----
-# input = MSstatsNormalize(input, "EQUALIZEMEDIANS") # MSstatsNormalize
-# input = MSstatsMergeFractions(input)
-# input = MSstatsHandleMissing(input, "TMP", TRUE,
-#                              "0", 0.999)
-# input = MSstatsSelectFeatures(input, "topN", 100)
-# summarized = MSstatsSummarize(input, "TMP", TRUE, "minFeature", "0", FALSE, TRUE, FALSE,
-#                               remove_uninformative_feature_outlier = FALSE,
-#                               clusters = NULL, message.show = FALSE)
-# MSstatsSummarizationOutput(input, summarized,"TMP")
+source("/home/rstudio/code/deployment/tests/utils/s3_helper_functions.R")
+source("/home/rstudio/code/deployment/tests/utils/dataprocess_helper_functions.R")
+source("/home/rstudio/code/deployment/tests/utils/constants.R")
+source("/home/rstudio/code/deployment/tests/utils/generic_utils.R")
+
+######################## Navarro DIAUmpire dataset ############################
+
+# `load()` R objects from S3
+# frags <- get_file_from_s3(s3_file_path = datasets$navarro_diaumpire_frags,
+#   local_file_name = "frags.RDS")
+# pepts <- get_file_from_s3(s3_file_path = datasets$navarro_diaumpire_pepts,
+#   local_file_name = "pepts.RDS")
+# prots <- get_file_from_s3(s3_file_path = datasets$navarro_diaumpire_prots,
+#   local_file_name = "prots.RDS")
+# dia_annot <- get_file_from_s3(s3_file_path = datasets$navarro_diaumpire_dia_annot,
+#   local_file_name = "dia_annot.RDS")
+
+###############################################################################
+
+
+
+############################### Navarro OpenSWATH ############################
+# `load()` R objects from S3
+open_swath_input <- get_file_from_s3(s3_file_path = datasets$navarro_openswath_input,
+  local_file_name = "open_swath_input.RDS")
+open_swath_annot <- get_file_from_s3(s3_file_path = datasets$navarro_openswath_annot,
+  local_file_name = "open_swath_annot.RDS")
+
+#converter
+open_swath = MSstatsdev::OpenSWATHtoMSstatsFormat(open_swath_input, open_swath_annot)
+
+#runs dataprocess function on stable and dev versions
+navarro_open_swath_output <- invoke_dataprocess(open_swath)
+navarro_open_swath_output_v3 <- navarro_open_swath_output$stable
+navarro_open_swath_output_v4 <- navarro_open_swath_output$dev
+
+navarro_open_swath_processed_data_v3 <- as.data.table(navarro_open_swath_output_v3$ProcessedData)
+navarro_open_swath_processed_data_v4 <- as.data.table(navarro_open_swath_output_v4$ProcessedData)
+
+#check columns that have null values
+navarro_open_swath_processed_data_v3[, which(colnames(
+  navarro_open_swath_processed_data_v3) %in% c('GROUP', 'SUBJECT_NESTED', 'SUBJECT')):=NULL]
+#rename data frame column names
+navarro_open_swath_processed_data_v3 <- rename_column(navarro_open_swath_processed_data_v3, 
+              old_names = c('GROUP_ORIGINAL', 'SUBJECT_ORIGINAL'), 
+              new_names = c('GROUP', 'SUBJECT'))
+
+#merge two dataframes
+navarro_open_swath_compare_processed <- merge_dataframes(
+  df1 = navarro_open_swath_processed_data_v3, 
+  df2 = navarro_open_swath_processed_data_v4,
+  col_names = c("GROUP", "SUBJECT", "INTENSITY", "ABUNDANCE", "censored", 
+                'predicted', 'remove', 'feature_quality', 'is_outlier'))
+
+
+## flag the difference : TRUE - matched, FALSE - issue
+navarro_open_swath_compare_processed <- compare_values(
+  navarro_open_swath_compare_processed)
+
+## if both NA, they also match.
+navarro_open_swath_compare_processed <- handle_na_values(
+  navarro_open_swath_compare_processed
+)
+
+## report this number
+navarro.processed.report <- data.frame(
+  dataset = "Navarro OpenSWATH",
+  args = "linear summary method",
+  match.orgint = sum(!navarro_open_swath_compare_processed$match.orgint),
+  match.abn = sum(!navarro_open_swath_compare_processed$match.abn),
+  match.censored = sum(!navarro_open_swath_compare_processed$match.censored),
+  match.ftrslct = sum(!navarro_open_swath_compare_processed$match.ftrslct),
+  match.otr = sum(!navarro_open_swath_compare_processed$match.otr)
+  )
+
+#uploading the results to s3 as csv
+store_csv_file_to_s3(s3_path = results$navarro_openswath_results, 
+                 local_file_name = "report.csv", upload_file=navarro.processed.report)
+
+################################################################################
