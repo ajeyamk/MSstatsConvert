@@ -6,8 +6,8 @@ dist: xenial
 cache: packages
 warnings_are_errors: false
 
-after_success:
-  - Rscript -e 'covr::codecov()'
+# after_success:
+#   - Rscript -e 'covr::codecov()'
 
 script:
   - zip -r latest *
