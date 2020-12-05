@@ -1,9 +1,73 @@
-library(data.table)
+invoke_dataprocess_non_parameterized<-function(input_file, 
+                                               summary_method="linear", 
+                                               mb_impute=FALSE,
+                                               censored_int="0"){
+  #against stable version
+  output_stable = MSstats::dataProcess(as.data.frame(unclass(input_file)), 
+                                       summaryMethod=summary_method, 
+                                       MBimpute=mb_impute, 
+                                       censoredInt=censored_int)
+  #against dev version
+  output_dev = MSstatsdev::dataProcess(input_file, 
+                                       summaryMethod=summary_method, 
+                                       MBimpute=mb_impute, 
+                                       censoredInt=censored_int)
+  return(list(stable=output_stable, dev=output_dev))
+}
 
-invoke_dataprocess<-function(input_file, summary_method="linear", mb_impute=FALSE,
-                             censored_int="0"){
+invoke_dataprocess_feature_subset<-function(input_file, 
+                                            summary_method="linear", 
+                                            mb_impute=FALSE,
+                                            censored_int="0",
+                                            n_top_feature=5){
+  # `featureSubset` argument parameterized data process function
+  # n_top_feature is defaulted to 5
+  #against stable version
+  output_stable = MSstats::dataProcess(as.data.frame(unclass(input_file)), 
+                                       summaryMethod=summary_method, 
+                                       MBimpute=mb_impute, 
+                                       censoredInt=censored_int,
+                                       n_top_feature = n_top_feature,
+                                       featureSubset = "topN")
+  #against dev version
+  output_dev = MSstatsdev::dataProcess(input_file, 
+                                       summaryMethod=summary_method, 
+                                       MBimpute=mb_impute, 
+                                       censoredInt=censored_int,
+                                       n_top_feature = n_top_feature,
+                                       featureSubset = "topN")
+  return(list(stable=output_stable, dev=output_dev))
+}
+
+invoke_dataprocess_feature_subset_outlier<-function(input_file, 
+                                                    summary_method="linear", 
+                                                    mb_impute=FALSE,
+                                                    censored_int="0",
+                                                    remove_uninformative_feature_outlier=TRUE){
+  # `featureSubset` argument parameterized data process function
+  # n_top_feature is defaulted to 5
+  #against stable version
+  output_stable = MSstats::dataProcess(as.data.frame(unclass(input_file)), 
+                                       summaryMethod=summary_method, 
+                                       MBimpute=mb_impute, 
+                                       censoredInt=censored_int,
+                                       remove_uninformative_feature_outlier = remove_uninformative_feature_outlier,
+                                       featureSubset = "highQuality")
+  #against dev version
+  output_dev = MSstatsdev::dataProcess(input_file, 
+                                       summaryMethod=summary_method, 
+                                       MBimpute=mb_impute, 
+                                       censoredInt=censored_int,
+                                       remove_uninformative_feature_outlier = remove_uninformative_feature_outlier,
+                                       featureSubset = "highQuality")
+  return(list(stable=output_stable, dev=output_dev))
+}
+
+invoke_dataprocess_non_parameterized<-function(input_file, 
+                                               summary_method="linear", 
+                                               mb_impute=FALSE,
+                                               censored_int="0"){
   # parameterized data process function
-  
   #against stable version
   output_stable = MSstats::dataProcess(as.data.frame(unclass(input_file)), 
                                        summaryMethod=summary_method, 
@@ -18,7 +82,6 @@ invoke_dataprocess<-function(input_file, summary_method="linear", mb_impute=FALS
 }
 
 compare_values_processed_data <- function(input_df){
-  #couldn't make this logic work. Saving for later
   #this logic is overkilled for now. Need to handle columns more flexibly
   input_df$match.orgint <- input_df$INTENSITY.x == input_df$INTENSITY.y
   input_df$match.abn <- input_df$ABUNDANCE.x == input_df$ABUNDANCE.y
@@ -77,126 +140,88 @@ handle_na_values_runlevel_data <- function(input_df){
   return(input_df)
 }
 
-possible_feature_columns = c("PeptideSequence", "PeptideModifiedSequence",
-                             "PrecursorCharge", "Charge", "FragmentIon", "ProductCharge")
-
-count_features = function(df) {
-  cols = intersect(colnames(df), possible_feature_columns)
-  uniqueN(df[, cols, with = FALSE])
-}
-
-count_proteins = function(df) {
-  uniqueN(df[, "ProteinName", with = FALSE])
-}
-
-count_peptides = function(df) {
-  pep_col = intersect(colnames(df), c("PeptideSequence", "PeptideModifiedSequence"))
-  uniqueN(df[, pep_col, with = FALSE])
-}
-
-get_features_per_protein = function(df) {
-  paste_ = function(...) paste(..., sep = "_")
-  # df = as.data.table(as(as(df, "MSstatsValidated"), "data.frame"))
-  cols = intersect(colnames(df), possible_feature_columns)
-  df$feature = do.call("paste_", as.list(df[, cols, with = FALSE]))
-  df[, .(n_features = uniqueN(feature)), by = "ProteinName"]
-}
-
-get_mean_features_per_protein = function(features_df) {
-  mean(features_df$n_features, na.rm = TRUE)
-}
-
-count_missing_values = function(df) {
-  sum(is.na(df$Intensity), na.rm = TRUE)
-}
-
-count_infinite = function(df) {
-  sum(!is.finite(df$Intensity))
-}
-
-count_zero_values = function(df) {
-  sum(abs(df$Intensity) < 1e-6, na.rm = TRUE)
-}
-
-count_exactly_zero = function(df) {
-  sum(df$Intensity == 0, na.rm = TRUE)
-}
-
-get_ram_size = function(df) {
-  pryr::object_size(df)
-}
-
-get_disk_size = function(file_path) {
-  file.info(file_path)$size / 1e6
-}
-
-count_rows = function(df) {
-  nrow(df)
-}
-
-count_cols = function(df) {
-  ncol(df)
-}
-
-count_measurements = function(df) {
-  paste_ = function(...) paste(..., sep = "_")
-  cols = intersect(colnames(df), possible_feature_columns)
-  df$feature = do.call("paste_", as.list(df[, cols, with = FALSE]))
-  count_by = intersect(colnames(df), c("ProteinName", cols, "Run", "Channel"))
-  df[, .(n_measurement = .N), by = count_by]
-}
-
-count_fractions = function(df) {
-  if (is.element("Fraction", colnames(df))) {
-    uniqueN(df$Fraction)
-  } else {
-    NA
-  }
-}
-
-count_design = function(df, col) {
-  if (is.element(col, colnames(df))) {
-    uniqueN(df[, col, with = FALSE])
-  } else {
-    NA
-  }
-}
-
-count_larger_than = function(df, threshold) {
-  sum(df$Intensity > threshold, na.rm = TRUE)
-}
-
-count_01 = function(df) {
-  sum(!is.na(df$Intensity) & df$Intensity > 0 & df$Intensity <= 1)
-}
-
-getStatsSingleVersion = function(df, version) {
-  data.table(
-    version = version,
-    n_features = count_features(df),
-    n_proteins = count_proteins(df),
-    n_peptides = count_peptides(df),
-    n_infinite = count_infinite(df),
-    n_missing = count_missing_values(df),
-    n_zero = count_zero_values(df),
-    n_exactly_zero = count_exactly_zero(df),
-    n_greater_than_0 = count_larger_than(df, 0),
-    n_greater_than_1 = count_larger_than(df, 1),
-    n_between_0_1 = count_01(df),
-    n_rows = count_rows(df),
-    n_cols = count_cols(df),
-    n_conditions = count_design(df, "Condition"),
-    n_bioreps = count_design(df, "BioReplicate"),
-    n_runs = count_design(df, "Run"),
-    n_tech_replicates = count_design(df, "TechRep"),
-    n_tech_rep_mixture = count_design(df, "TechRepMixture"),
-    n_fractions = count_fractions(df),
-    n_channels = count_design(df, "Channel"))
-}
-getStats = function(v3, v4) {
-  rbindlist(
-    list(getStatsSingleVersion(as.data.table(v3), "v3"),
-         getStatsSingleVersion(as.data.table(as(v4, "data.frame")), "v4"))
+run_comparisons <- function(dataprocess_output, master_df, notes){
+  dataprocess_output_v3 <- dataprocess_output$stable
+  dataprocess_output_v4 <- dataprocess_output$dev
+  
+  # checking output on processed data
+  processed_data_v3 <- as.data.table(dataprocess_output_v3$ProcessedData)
+  processed_data_v4 <- as.data.table(dataprocess_output_v4$ProcessedData)
+  
+  #check columns that have null values
+  processed_data_v3[, which(colnames(
+    processed_data_v3) %in% c('GROUP', 'SUBJECT_NESTED', 'SUBJECT')):=NULL]
+  #rename data frame column names
+  processed_data_v3 <- rename_column(
+    processed_data_v3, old_names = c('GROUP_ORIGINAL', 'SUBJECT_ORIGINAL'), 
+    new_names = c('GROUP', 'SUBJECT'))
+  
+  #merge two dataframes
+  compare_processed <- merge_dataframes(
+    df1 = processed_data_v3, 
+    df2 = processed_data_v4,
+    col_names = c("GROUP", "SUBJECT", "INTENSITY", "ABUNDANCE", "censored", 
+                  'predicted', 'remove', 'feature_quality', 'is_outlier'))
+  
+  
+  ## flag the difference : TRUE - matched, FALSE - issue
+  compare_processed <- compare_values_processed_data(compare_processed)
+  
+  ## if both NA, they also match.
+  compare_processed <- handle_na_values_processed_data(compare_processed)
+  
+  ## report this number
+  processed.report <- data.frame(
+    summary_method_type = summary_method,
+    data_type = "Processed data",
+    parameters=notes,
+    intensity = sum(!compare_processed$match.orgint),
+    abundance = sum(!compare_processed$match.abn),
+    censored = sum(!compare_processed$match.censored),
+    feature_quality = sum(!compare_processed$match.ftrslct),
+    is_outlier = sum(!compare_processed$match.otr),
+    s3_dataset_path = dataset_path
   )
-  # list(class(v3), class(v4))
+  
+  master_df$master_processed_data <-rbind(master_df$master_processed_data, 
+                                          processed.report)
+  
+  # checking output on runlevel data
+  runlevel_data_v3 <- as.data.table(dataprocess_output_v3$RunlevelData)
+  runlevel_data_v4 = as.data.table(dataprocess_output_v4$RunlevelData)
+  
+  runlevel_data_v3 <- runlevel_data_v3[, -which(colnames(runlevel_data_v3) %in% c('GROUP', 'SUBJECT_NESTED', 'SUBJECT'))]
+  
+  runlevel_data_v4 <- as.data.table(runlevel_data_v4)
+  runlevel_data_v4[, GROUP := as.factor(as.character(GROUP))]
+  runlevel_data_v4[, SUBJECT := as.factor(as.character(SUBJECT))]
+  
+  summarized_runlevel = merge_dataframes(
+    df1 = runlevel_data_v3,
+    df2 = runlevel_data_v4,
+    col_names = c("RUN", "Protein")
+  )
+  
+  ## flag the difference : TRUE - matched, FALSE - issue
+  summarized_runlevel <- compare_values_runlevel_data(
+    summarized_runlevel)
+  
+  ## if both NA, they also match.
+  summarized_runlevel <- handle_na_values_runlevel_data(
+    summarized_runlevel)
+  
+  ## report this number
+  runlevel.report <- data.frame(
+    summary_method_type = summary_method,
+    data_type = "RunLevel data",
+    parameters=notes,
+    log_intensity = sum(!summarized_runlevel$match.int),
+    missing_percentage = sum(!summarized_runlevel$match.perc),
+    imputed_feature_count = sum(!summarized_runlevel$match.numimpf),
+    measured_feature_count = sum(!summarized_runlevel$match.nummsrf),
+    s3_dataset_path = dataset_path
+  )
+  master_df$master_run_level_data <-rbind(master_df$master_run_level_data, 
+                                          runlevel.report)
+  return(master_df)
 }
