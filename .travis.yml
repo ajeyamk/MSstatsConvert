@@ -6,9 +6,11 @@ dist: xenial
 cache: packages
 warnings_are_errors: false
 
-# after_success:
-#   - Rscript -e 'covr::codecov()'
-
+after_success:
+   - Rscript -e 'covr::codecov()'
+branches:
+  only: 
+    - master
 script:
   - zip -r latest *
   - mkdir -p deployment
