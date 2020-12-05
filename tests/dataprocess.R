@@ -126,3 +126,20 @@ store_csv_file_to_s3(s3_path = results$navarro_openswath_results,
 closeAllConnections()
 rm(list=ls(all=TRUE))
 ###############################################################################
+
+
+
+
+master_df <- data.frame()
+
+lala <- data.frame(a=1, b=2)
+bola <- data.frame(a=4, b=5)
+master_df <- rbind(master_df, lala)
+master_df <- rbind(master_df, bola)
+
+
+
+
+
+
+
