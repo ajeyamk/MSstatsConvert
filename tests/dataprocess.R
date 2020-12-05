@@ -289,6 +289,6 @@ result_df <-run_wider_testing(metadata_s3)
 store_csv_file_to_s3(s3_path = results$code_deploy_results,
                      local_file_name = "report.xlsx", upload_file=result_df)
 ####### ##################### cleaning up #####################################
-# closeAllConnections()
-# rm(list=ls(all=TRUE))
+closeAllConnections()
+rm(list=ls(all=TRUE))
 ###############################################################################
