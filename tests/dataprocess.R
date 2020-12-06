@@ -165,118 +165,119 @@ run_wider_testing <- function(metadata,
                                             mb_impute=is_impute,
                                             censored_int="NA")
         })
-      } else if (dataset$tool == "OpenMS") {
-        #######################################################################
-        ################# constructing dataset paths on s3 ###################
-        s3_input_path = gsub(path_to_datasets, "", paste0(
-          datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
-            ".", "", dataset$input_path))))
-        ################# Loading object to memory ###################
-        input <- get_file_from_s3(s3_file_path = s3_input_path,
-                                  local_file_name = "input.RDS")
-        #######################################################################
-        if (dataset$type == "TMT") {
-          try({
-            open_ms_converter = MSstatsTMT::OpenMStoMSstatsTMTFormat(
-              input,rmPSM_withfewMea_withinRun = remove_few,
-              rmProtein_with1Feature = remove_single_feature)})
-        } else {
-          try({
-            open_ms_converter = MSstatsdev::OpenMStoMSstatsFormat(
-              input, rmPSM_withfewMea_withinRun = remove_few,
-              rmProtein_with1Feature = remove_single_feature)})
-        }
-        master_results <- run_dataprocess(data=open_ms_converter, 
-                                          dataset_path=s3_input_path, 
-                                          master_result_df=master_results,
-                                          summary_method=summarization_type, 
-                                          mb_impute=is_impute,
-                                          censored_int="NA")
-      } else {
-        #######################################################################
-        ################# constructing dataset paths on s3 ###################
-        s3_input_data_path <- gsub(path_to_datasets, "", paste0(
-          datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
-            ".", "", dataset$input_path))))
-        s3_annotation_path = gsub(path_to_datasets, "", paste0(
-          datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
-            ".", "",dataset$annotation_path))))
-        ################# Loading object to memory ###################
-        input <- get_file_from_s3(s3_file_path = s3_input_data_path,
-                                  local_file_name = "input.RDS")
-        annotation <- get_file_from_s3(s3_file_path = s3_annotation_path,
-                                       local_file_name = "annotation.RDS")
-        input = as.data.frame(input)
-        annotation = as.data.frame(annotation)
-        #######################################################################
-        
-        if (dataset$tool == "PD") {
-          if (dataset$type == "TMT") {
-            pd_converter = MSstatsTMT::PDtoMSstatsTMTFormat(
-              input, annotation, rmPSM_withfewMea_withinRun = remove_few,
-              rmProtein_with1Feature = remove_single_feature)
-          } else {
-            pd_converter = MSstatsdev::PDtoMSstatsFormat(
-              input, annotation,removeProtein_with1Peptide = remove_single_feature,
-              fewMeasurements = remove_few_lf)
-          }
-          master_results <- run_dataprocess(
-            data=pd_converter, dataset_path=s3_input_data_path, 
-            master_result_df=master_results, summary_method=summarization_type, 
-            mb_impute=is_impute, censored_int="0")
-        }
-        if (dataset$tool == "OpenSWATH") {
-          os_converter = MSstatsdev::OpenSWATHtoMSstatsFormat(
-            input, annotation,removeProtein_with1Feature = remove_single_feature,
-            fewMeasurements = remove_few_lf)
-          master_results <- run_dataprocess(
-            data=os_converter, dataset_path=s3_input_data_path, 
-            master_result_df=master_results,
-            summary_method=summarization_type, 
-            mb_impute=is_impute,censored_int="0")
-        }
-        if (dataset$tool == "Progenesis") {
-          progenesis_converter = MSstatsdev::ProgenesistoMSstatsFormat(
-            input, annotation,
-            removeProtein_with1Peptide = remove_single_feature,
-            fewMeasurements = remove_few_lf)
-          master_results <- run_dataprocess(
-            data=progenesis_converter, dataset_path=s3_input_data_path, 
-            master_result_df=master_results,
-            summary_method=summarization_type, 
-            mb_impute=is_impute,censored_int="0")
-        }
-        if (dataset$tool == "Skyline") {
-          skyline_converter = MSstatsdev::SkylinetoMSstatsFormat(
-            input, annotation,removeProtein_with1Feature = remove_single_feature,
-            fewMeasurements = remove_few_lf)
-          master_results <- run_dataprocess(
-            data=skyline_converter, dataset_path=s3_input_data_path, 
-            master_result_df=master_results,
-            summary_method=summarization_type, 
-            mb_impute=is_impute,censored_int="0")
-        }
-        if (dataset$tool == "SpectroMine") {
-          spectromine_converter = MSstatsTMT::SpectroMinetoMSstatsTMTFormat(
-            input, annotation, rmPSM_withfewMea_withinRun = remove_few,
-            rmProtein_with1Feature = remove_single_feature)
-          master_results <- run_dataprocess(
-            data=spectromine_converter, dataset_path=s3_input_data_path, 
-            master_result_df=master_results,
-            summary_method=summarization_type, 
-            mb_impute=is_impute,censored_int="0")
-        }
-        if (dataset$tool == "Spectronaut") {
-          spectronaut_converter = MSstatsdev::SpectronauttoMSstatsFormat(
-            input, annotation,removeProtein_with1Feature = remove_single_feature,
-            fewMeasurements = remove_few_lf)
-          master_results <- run_dataprocess(
-            data=spectronaut_converter, dataset_path=s3_input_data_path, 
-            master_result_df=master_results,
-            summary_method=summarization_type, 
-            mb_impute=is_impute,censored_int="0")
-        }
-      }
+      } 
+      # else if (dataset$tool == "OpenMS") {
+      #   #######################################################################
+      #   ################# constructing dataset paths on s3 ###################
+      #   s3_input_path = gsub(path_to_datasets, "", paste0(
+      #     datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
+      #       ".", "", dataset$input_path))))
+      #   ################# Loading object to memory ###################
+      #   input <- get_file_from_s3(s3_file_path = s3_input_path,
+      #                             local_file_name = "input.RDS")
+      #   #######################################################################
+      #   if (dataset$type == "TMT") {
+      #     try({
+      #       open_ms_converter = MSstatsTMT::OpenMStoMSstatsTMTFormat(
+      #         input,rmPSM_withfewMea_withinRun = remove_few,
+      #         rmProtein_with1Feature = remove_single_feature)})
+      #   } else {
+      #     try({
+      #       open_ms_converter = MSstatsdev::OpenMStoMSstatsFormat(
+      #         input, rmPSM_withfewMea_withinRun = remove_few,
+      #         rmProtein_with1Feature = remove_single_feature)})
+      #   }
+      #   master_results <- run_dataprocess(data=open_ms_converter, 
+      #                                     dataset_path=s3_input_path, 
+      #                                     master_result_df=master_results,
+      #                                     summary_method=summarization_type, 
+      #                                     mb_impute=is_impute,
+      #                                     censored_int="NA")
+      # } else {
+      #   #######################################################################
+      #   ################# constructing dataset paths on s3 ###################
+      #   s3_input_data_path <- gsub(path_to_datasets, "", paste0(
+      #     datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
+      #       ".", "", dataset$input_path))))
+      #   s3_annotation_path = gsub(path_to_datasets, "", paste0(
+      #     datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
+      #       ".", "",dataset$annotation_path))))
+      #   ################# Loading object to memory ###################
+      #   input <- get_file_from_s3(s3_file_path = s3_input_data_path,
+      #                             local_file_name = "input.RDS")
+      #   annotation <- get_file_from_s3(s3_file_path = s3_annotation_path,
+      #                                  local_file_name = "annotation.RDS")
+      #   input = as.data.frame(input)
+      #   annotation = as.data.frame(annotation)
+      #   #######################################################################
+      #   
+      #   if (dataset$tool == "PD") {
+      #     if (dataset$type == "TMT") {
+      #       pd_converter = MSstatsTMT::PDtoMSstatsTMTFormat(
+      #         input, annotation, rmPSM_withfewMea_withinRun = remove_few,
+      #         rmProtein_with1Feature = remove_single_feature)
+      #     } else {
+      #       pd_converter = MSstatsdev::PDtoMSstatsFormat(
+      #         input, annotation,removeProtein_with1Peptide = remove_single_feature,
+      #         fewMeasurements = remove_few_lf)
+      #     }
+      #     master_results <- run_dataprocess(
+      #       data=pd_converter, dataset_path=s3_input_data_path, 
+      #       master_result_df=master_results, summary_method=summarization_type, 
+      #       mb_impute=is_impute, censored_int="0")
+      #   }
+      #   if (dataset$tool == "OpenSWATH") {
+      #     os_converter = MSstatsdev::OpenSWATHtoMSstatsFormat(
+      #       input, annotation,removeProtein_with1Feature = remove_single_feature,
+      #       fewMeasurements = remove_few_lf)
+      #     master_results <- run_dataprocess(
+      #       data=os_converter, dataset_path=s3_input_data_path, 
+      #       master_result_df=master_results,
+      #       summary_method=summarization_type, 
+      #       mb_impute=is_impute,censored_int="0")
+      #   }
+      #   if (dataset$tool == "Progenesis") {
+      #     progenesis_converter = MSstatsdev::ProgenesistoMSstatsFormat(
+      #       input, annotation,
+      #       removeProtein_with1Peptide = remove_single_feature,
+      #       fewMeasurements = remove_few_lf)
+      #     master_results <- run_dataprocess(
+      #       data=progenesis_converter, dataset_path=s3_input_data_path, 
+      #       master_result_df=master_results,
+      #       summary_method=summarization_type, 
+      #       mb_impute=is_impute,censored_int="0")
+      #   }
+      #   if (dataset$tool == "Skyline") {
+      #     skyline_converter = MSstatsdev::SkylinetoMSstatsFormat(
+      #       input, annotation,removeProtein_with1Feature = remove_single_feature,
+      #       fewMeasurements = remove_few_lf)
+      #     master_results <- run_dataprocess(
+      #       data=skyline_converter, dataset_path=s3_input_data_path, 
+      #       master_result_df=master_results,
+      #       summary_method=summarization_type, 
+      #       mb_impute=is_impute,censored_int="0")
+      #   }
+      #   if (dataset$tool == "SpectroMine") {
+      #     spectromine_converter = MSstatsTMT::SpectroMinetoMSstatsTMTFormat(
+      #       input, annotation, rmPSM_withfewMea_withinRun = remove_few,
+      #       rmProtein_with1Feature = remove_single_feature)
+      #     master_results <- run_dataprocess(
+      #       data=spectromine_converter, dataset_path=s3_input_data_path, 
+      #       master_result_df=master_results,
+      #       summary_method=summarization_type, 
+      #       mb_impute=is_impute,censored_int="0")
+      #   }
+      #   if (dataset$tool == "Spectronaut") {
+      #     spectronaut_converter = MSstatsdev::SpectronauttoMSstatsFormat(
+      #       input, annotation,removeProtein_with1Feature = remove_single_feature,
+      #       fewMeasurements = remove_few_lf)
+      #     master_results <- run_dataprocess(
+      #       data=spectronaut_converter, dataset_path=s3_input_data_path, 
+      #       master_result_df=master_results,
+      #       summary_method=summarization_type, 
+      #       mb_impute=is_impute,censored_int="0")
+      #   }
+      # }
     }, error = function(e) {
       problems <<- c(problems, dataset$folder_path)
       print(e)
@@ -288,6 +289,7 @@ run_wider_testing <- function(metadata,
 problems = list()
 result_df <-run_wider_testing(metadata_s3)
 
+store_rds(result_df, "local.RDS", "code-deploy-results/temp.RDS")
 #uploading the results to s3 as csv
 store_csv_file_to_s3(s3_path = results$code_deploy_results,
                      local_file_name = "report.xlsx", upload_file=result_df)

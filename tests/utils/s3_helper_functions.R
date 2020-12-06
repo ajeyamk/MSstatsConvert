@@ -71,3 +71,10 @@ generate_s3_path <- function(s3_path){
                         sep = "")
   return(s3_file_path)
 }
+
+store_rds <- function(file_up, local_name, some_path){
+  s3$put_object(
+    Body = write_bin_files_s3(file_up, local_name, is_rds = T), 
+    Bucket = aws_bucket_name, 
+    Key = some_path)
+}
