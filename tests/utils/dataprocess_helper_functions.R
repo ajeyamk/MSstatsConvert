@@ -140,7 +140,7 @@ handle_na_values_runlevel_data <- function(input_df){
   return(input_df)
 }
 
-run_comparisons <- function(dataprocess_output, master_df, notes){
+run_comparisons <- function(dataprocess_output, master_df, notes, summary_method, dataset_path){
   dataprocess_output_v3 <- dataprocess_output$stable
   dataprocess_output_v4 <- dataprocess_output$dev
   

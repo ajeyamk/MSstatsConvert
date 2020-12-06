@@ -31,7 +31,7 @@ run_dataprocess <- function(data,
                                                              summary_method, 
                                                              mb_impute, censored_int)
   master_result_df <- run_comparisons(dataprocess_output, master_result_df, 
-                                      notes="Non parameterized run")
+                                      notes="Non parameterized run", summary_method, dataset_path)
   
   ############### parameterized dataprocess run #########################
   # parameterized on featureSubset = "topN" and n_top_feature = 5
@@ -40,7 +40,8 @@ run_dataprocess <- function(data,
                                                          censored_int, 
                                                          n_top_feature=5)
   master_result_df <- run_comparisons(dataprocess_output, master_result_df, 
-                                      notes = paste("parameterized on featureSubset = 'topN' and n_top_feature = ", n_top_feature))
+                                      notes = "parameterized on featureSubset = 'topN' and n_top_feature = 5", 
+                                      summary_method, dataset_path)
   
   ############### parameterized dataprocess run #########################
   # parameterized on featureSubset = "topN" and remove_uninformative_feature_outlier = TRUE
@@ -48,7 +49,8 @@ run_dataprocess <- function(data,
     data, summary_method, mb_impute, 
     censored_int, remove_uninformative_feature_outlier=TRUE)
   master_result_df <- run_comparisons(dataprocess_output, master_result_df,
-                                      notes = "parameterized on featureSubset = 'topN' and remove_uninformative_feature_outlier = TRUE")
+                                      notes = "parameterized on featureSubset = 'topN' and remove_uninformative_feature_outlier = TRUE", 
+                                      summary_method, dataset_path)
   
   ############### parameterized dataprocess run #########################
   # parameterized on featureSubset = "topN" and remove_uninformative_feature_outlier = FALSE
@@ -56,7 +58,8 @@ run_dataprocess <- function(data,
     data, summary_method, mb_impute, 
     censored_int, remove_uninformative_feature_outlier=FALSE)
   master_result_df <- run_comparisons(dataprocess_output, master_result_df, 
-                                      notes = "parameterized on featureSubset = 'topN' and remove_uninformative_feature_outlier = FALSE")
+                                      notes = "parameterized on featureSubset = 'topN' and remove_uninformative_feature_outlier = FALSE",
+                                      summary_method, dataset_path)
   
   return(master_result_df)
 }
@@ -218,7 +221,7 @@ run_wider_testing <- function(metadata,
               fewMeasurements = remove_few_lf)
           }
           master_results <- run_dataprocess(
-            data=pd_converter, dataset_path=s3_input_path, 
+            data=pd_converter, dataset_path=s3_input_data_path, 
             master_result_df=master_results, summary_method=summarization_type, 
             mb_impute=is_impute, censored_int="0")
         }
@@ -227,7 +230,7 @@ run_wider_testing <- function(metadata,
             input, annotation,removeProtein_with1Feature = remove_single_feature,
             fewMeasurements = remove_few_lf)
           master_results <- run_dataprocess(
-            data=os_converter, dataset_path=s3_input_path, 
+            data=os_converter, dataset_path=s3_input_data_path, 
             master_result_df=master_results,
             summary_method=summarization_type, 
             mb_impute=is_impute,censored_int="0")
@@ -238,7 +241,7 @@ run_wider_testing <- function(metadata,
             removeProtein_with1Peptide = remove_single_feature,
             fewMeasurements = remove_few_lf)
           master_results <- run_dataprocess(
-            data=progenesis_converter, dataset_path=s3_input_path, 
+            data=progenesis_converter, dataset_path=s3_input_data_path, 
             master_result_df=master_results,
             summary_method=summarization_type, 
             mb_impute=is_impute,censored_int="0")
@@ -248,7 +251,7 @@ run_wider_testing <- function(metadata,
             input, annotation,removeProtein_with1Feature = remove_single_feature,
             fewMeasurements = remove_few_lf)
           master_results <- run_dataprocess(
-            data=skyline_converter, dataset_path=s3_input_path, 
+            data=skyline_converter, dataset_path=s3_input_data_path, 
             master_result_df=master_results,
             summary_method=summarization_type, 
             mb_impute=is_impute,censored_int="0")
@@ -258,7 +261,7 @@ run_wider_testing <- function(metadata,
             input, annotation, rmPSM_withfewMea_withinRun = remove_few,
             rmProtein_with1Feature = remove_single_feature)
           master_results <- run_dataprocess(
-            data=spectromine_converter, dataset_path=s3_input_path, 
+            data=spectromine_converter, dataset_path=s3_input_data_path, 
             master_result_df=master_results,
             summary_method=summarization_type, 
             mb_impute=is_impute,censored_int="0")
@@ -268,7 +271,7 @@ run_wider_testing <- function(metadata,
             input, annotation,removeProtein_with1Feature = remove_single_feature,
             fewMeasurements = remove_few_lf)
           master_results <- run_dataprocess(
-            data=spectronaut_converter, dataset_path=s3_input_path, 
+            data=spectronaut_converter, dataset_path=s3_input_data_path, 
             master_result_df=master_results,
             summary_method=summarization_type, 
             mb_impute=is_impute,censored_int="0")
