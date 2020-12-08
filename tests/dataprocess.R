@@ -23,43 +23,59 @@ metadata_s3 = metadata_s3[!(sapply(metadata_s3, function(x) x$name) %in% c("Azim
 
 ######################### define dataprocess function ##########################
 run_dataprocess <- function(data, 
-                            dataset_path, master_result_df, summary_method, 
+                            dataset_path, master_result_df, 
                             mb_impute=FALSE,censored_int="0"){
   
-  ################# Non parameterized dataprocess run ####################
-  dataprocess_output <- invoke_dataprocess_non_parameterized(data, 
-                                                             summary_method, 
-                                                             mb_impute, censored_int)
-  master_result_df <- run_comparisons(dataprocess_output, master_result_df, 
-                                      notes="Non parameterized run", summary_method, dataset_path)
+  ################# parameterized dataprocess run 1 ####################
+  # summaryMethod='TMP' + MBimpute=T or F + censoredInt= 'NA' or '0' + featureSub='All'
+  feature_sub_all_dataprocess_output <- invoke_dataprocess_feature_subset_all(
+    data, summary_method="TMP", mb_impute, censored_int, feature_subset="all")
+  master_result_df <- run_comparisons(feature_sub_all_dataprocess_output,
+                                      master_df=master_result_df,
+                                      notes="summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='All'",
+                                      summary_method="TMP", dataset_path)
+  print("summaryMethod='TMP' + MBimpute=T or F + censoredInt= 'NA' or '0' + featureSub='All'")
   
-  ############### parameterized dataprocess run #########################
-  # parameterized on featureSubset = "topN" and n_top_feature = 5
-  dataprocess_output <-invoke_dataprocess_feature_subset(data, summary_method, 
-                                                         mb_impute, 
-                                                         censored_int, 
+  ############### parameterized dataprocess run 2 #########################
+  # summaryMethod='TMP' + MBimpute=T + censoredInt= 'NA' or '0' + featureSub='topN' + n_top_feature=5
+  top_n_dataprocess_output <-invoke_dataprocess_feature_subset_topn(data, summary_method="TMP",
+                                                         mb_impute,
+                                                         censored_int,
+                                                         feature_subset="topN",
                                                          n_top_feature=5)
-  master_result_df <- run_comparisons(dataprocess_output, master_result_df, 
-                                      notes = "parameterized on featureSubset = 'topN' and n_top_feature = 5", 
-                                      summary_method, dataset_path)
-  
-  ############### parameterized dataprocess run #########################
-  # parameterized on featureSubset = "topN" and remove_uninformative_feature_outlier = TRUE
-  dataprocess_output <- invoke_dataprocess_feature_subset_outlier(
-    data, summary_method, mb_impute, 
-    censored_int, remove_uninformative_feature_outlier=TRUE)
-  master_result_df <- run_comparisons(dataprocess_output, master_result_df,
-                                      notes = "parameterized on featureSubset = 'topN' and remove_uninformative_feature_outlier = TRUE", 
-                                      summary_method, dataset_path)
-  
-  ############### parameterized dataprocess run #########################
-  # parameterized on featureSubset = "topN" and remove_uninformative_feature_outlier = FALSE
-  dataprocess_output <- invoke_dataprocess_feature_subset_outlier(
-    data, summary_method, mb_impute, 
-    censored_int, remove_uninformative_feature_outlier=FALSE)
-  master_result_df <- run_comparisons(dataprocess_output, master_result_df, 
-                                      notes = "parameterized on featureSubset = 'topN' and remove_uninformative_feature_outlier = FALSE",
-                                      summary_method, dataset_path)
+  master_result_df <- run_comparisons(top_n_dataprocess_output, master_df=master_result_df,
+                                      notes = "summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='topN' + n_top_feature=5",
+                                      summary_method="TMP", dataset_path)
+  print("summaryMethod='TMP' + MBimpute=T + censoredInt= 'NA' or '0' + featureSub='topN' + n_top_feature=5")
+
+  ############### parameterized dataprocess run 3#########################
+  # summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='highQuality' + remove_uninformative_feature_outlier = T/ F
+  hq_dataprocess_output <- invoke_dataprocess_feature_subset_high_quality(
+    data, summary_method="TMP", mb_impute, censored_int,
+    feature_subset = "highQuality",
+    remove_uninformative_feature_outlier=TRUE)
+  master_result_df <- run_comparisons(hq_dataprocess_output, master_df=master_result_df,
+                                      notes = "summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='highQuality' + remove_uninformative_feature_outlier = T/ F",
+                                      summary_method="TMP", dataset_path)
+  print("summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='highQuality' + remove_uninformative_feature_outlier = T/ F")
+
+  ############### parameterized dataprocess run 4#########################
+  # summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='All'
+  linear_feature_sub_all_dataprocess_output <- invoke_dataprocess_feature_subset_all(
+    data, summary_method="linear", mb_impute, censored_int, feature_subset="All")
+  master_result_df <- run_comparisons(linear_feature_sub_all_dataprocess_output, master_df=master_result_df,
+                                      notes = "summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='All'",
+                                      summary_method="linear", dataset_path)
+  print("summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='All'")
+
+  ############### parameterized dataprocess run 5#########################
+  # summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='topN'
+  linear_feature_sub_all_dataprocess_output_topn <- invoke_dataprocess_feature_subset_topn(
+    data, summary_method="TMP", mb_impute, censored_int, feature_subset="topN",n_top_feature=5)
+  master_result_df <- run_comparisons(linear_feature_sub_all_dataprocess_output_topn, master_df=master_result_df,
+                                      notes = "parameterized on remove_uninformative_feature_outlier = FALSE",
+                                      summary_method="linear", dataset_path)
+  print("summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='topN'")
   
   return(master_result_df)
 }
@@ -70,8 +86,6 @@ run_dataprocess <- function(data,
 ######################### WIDER TESTING ########################################
 
 run_wider_testing <- function(metadata,
-                              summarization_type="linear",
-                              is_impute=FALSE,
                               remove_single_feature = FALSE, 
                               remove_few = TRUE) {
   
@@ -124,11 +138,11 @@ run_wider_testing <- function(metadata,
           master_results <- run_dataprocess(data=max_quant_conv, 
                                             dataset_path=s3_evidence_path, 
                                             master_result_df = master_results, 
-                                            summary_method=summarization_type, 
-                                            mb_impute=is_impute,
+                                            mb_impute=TRUE,
                                             censored_int="NA")
         })
-      } else if (dataset$tool == "DIAUmpire") {
+      } 
+      else if (dataset$tool == "DIAUmpire") {
         #######################################################################
         ################# constructing dataset paths on s3 ###################
         s3_fragment_path <- gsub(path_to_datasets, "", paste0(
@@ -155,129 +169,121 @@ run_wider_testing <- function(metadata,
         #######################################################################
         try({
           diau_conv = MSstatsdev::DIAUmpiretoMSstatsFormat(
-            fragments, peptides, proteins, annotation, 
+            fragments, peptides, proteins, annotation,
             removeProtein_with1Feature = remove_single_feature,
             fewMeasurements = remove_few_lf)
-          master_results <- run_dataprocess(data=diau_conv, 
-                                            dataset_path=s3_fragment_path, 
-                                            master_result_df=master_results, 
-                                            summary_method=summarization_type, 
+          master_results <- run_dataprocess(data=diau_conv,
+                                            dataset_path=s3_fragment_path,
+                                            master_result_df=master_results,
                                             mb_impute=is_impute,
                                             censored_int="NA")
         })
-      } 
-      # else if (dataset$tool == "OpenMS") {
-      #   #######################################################################
-      #   ################# constructing dataset paths on s3 ###################
-      #   s3_input_path = gsub(path_to_datasets, "", paste0(
-      #     datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
-      #       ".", "", dataset$input_path))))
-      #   ################# Loading object to memory ###################
-      #   input <- get_file_from_s3(s3_file_path = s3_input_path,
-      #                             local_file_name = "input.RDS")
-      #   #######################################################################
-      #   if (dataset$type == "TMT") {
-      #     try({
-      #       open_ms_converter = MSstatsTMT::OpenMStoMSstatsTMTFormat(
-      #         input,rmPSM_withfewMea_withinRun = remove_few,
-      #         rmProtein_with1Feature = remove_single_feature)})
-      #   } else {
-      #     try({
-      #       open_ms_converter = MSstatsdev::OpenMStoMSstatsFormat(
-      #         input, rmPSM_withfewMea_withinRun = remove_few,
-      #         rmProtein_with1Feature = remove_single_feature)})
-      #   }
-      #   master_results <- run_dataprocess(data=open_ms_converter, 
-      #                                     dataset_path=s3_input_path, 
-      #                                     master_result_df=master_results,
-      #                                     summary_method=summarization_type, 
-      #                                     mb_impute=is_impute,
-      #                                     censored_int="NA")
-      # } else {
-      #   #######################################################################
-      #   ################# constructing dataset paths on s3 ###################
-      #   s3_input_data_path <- gsub(path_to_datasets, "", paste0(
-      #     datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
-      #       ".", "", dataset$input_path))))
-      #   s3_annotation_path = gsub(path_to_datasets, "", paste0(
-      #     datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
-      #       ".", "",dataset$annotation_path))))
-      #   ################# Loading object to memory ###################
-      #   input <- get_file_from_s3(s3_file_path = s3_input_data_path,
-      #                             local_file_name = "input.RDS")
-      #   annotation <- get_file_from_s3(s3_file_path = s3_annotation_path,
-      #                                  local_file_name = "annotation.RDS")
-      #   input = as.data.frame(input)
-      #   annotation = as.data.frame(annotation)
-      #   #######################################################################
-      #   
-      #   if (dataset$tool == "PD") {
-      #     if (dataset$type == "TMT") {
-      #       pd_converter = MSstatsTMT::PDtoMSstatsTMTFormat(
-      #         input, annotation, rmPSM_withfewMea_withinRun = remove_few,
-      #         rmProtein_with1Feature = remove_single_feature)
-      #     } else {
-      #       pd_converter = MSstatsdev::PDtoMSstatsFormat(
-      #         input, annotation,removeProtein_with1Peptide = remove_single_feature,
-      #         fewMeasurements = remove_few_lf)
-      #     }
-      #     master_results <- run_dataprocess(
-      #       data=pd_converter, dataset_path=s3_input_data_path, 
-      #       master_result_df=master_results, summary_method=summarization_type, 
-      #       mb_impute=is_impute, censored_int="0")
-      #   }
-      #   if (dataset$tool == "OpenSWATH") {
-      #     os_converter = MSstatsdev::OpenSWATHtoMSstatsFormat(
-      #       input, annotation,removeProtein_with1Feature = remove_single_feature,
-      #       fewMeasurements = remove_few_lf)
-      #     master_results <- run_dataprocess(
-      #       data=os_converter, dataset_path=s3_input_data_path, 
-      #       master_result_df=master_results,
-      #       summary_method=summarization_type, 
-      #       mb_impute=is_impute,censored_int="0")
-      #   }
-      #   if (dataset$tool == "Progenesis") {
-      #     progenesis_converter = MSstatsdev::ProgenesistoMSstatsFormat(
-      #       input, annotation,
-      #       removeProtein_with1Peptide = remove_single_feature,
-      #       fewMeasurements = remove_few_lf)
-      #     master_results <- run_dataprocess(
-      #       data=progenesis_converter, dataset_path=s3_input_data_path, 
-      #       master_result_df=master_results,
-      #       summary_method=summarization_type, 
-      #       mb_impute=is_impute,censored_int="0")
-      #   }
-      #   if (dataset$tool == "Skyline") {
-      #     skyline_converter = MSstatsdev::SkylinetoMSstatsFormat(
-      #       input, annotation,removeProtein_with1Feature = remove_single_feature,
-      #       fewMeasurements = remove_few_lf)
-      #     master_results <- run_dataprocess(
-      #       data=skyline_converter, dataset_path=s3_input_data_path, 
-      #       master_result_df=master_results,
-      #       summary_method=summarization_type, 
-      #       mb_impute=is_impute,censored_int="0")
-      #   }
-      #   if (dataset$tool == "SpectroMine") {
-      #     spectromine_converter = MSstatsTMT::SpectroMinetoMSstatsTMTFormat(
-      #       input, annotation, rmPSM_withfewMea_withinRun = remove_few,
-      #       rmProtein_with1Feature = remove_single_feature)
-      #     master_results <- run_dataprocess(
-      #       data=spectromine_converter, dataset_path=s3_input_data_path, 
-      #       master_result_df=master_results,
-      #       summary_method=summarization_type, 
-      #       mb_impute=is_impute,censored_int="0")
-      #   }
-      #   if (dataset$tool == "Spectronaut") {
-      #     spectronaut_converter = MSstatsdev::SpectronauttoMSstatsFormat(
-      #       input, annotation,removeProtein_with1Feature = remove_single_feature,
-      #       fewMeasurements = remove_few_lf)
-      #     master_results <- run_dataprocess(
-      #       data=spectronaut_converter, dataset_path=s3_input_data_path, 
-      #       master_result_df=master_results,
-      #       summary_method=summarization_type, 
-      #       mb_impute=is_impute,censored_int="0")
-      #   }
-      # }
+      }else if (dataset$tool == "OpenMS") {
+        #######################################################################
+        ################# constructing dataset paths on s3 ###################
+        s3_input_path = gsub(path_to_datasets, "", paste0(
+          datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
+            ".", "", dataset$input_path))))
+        ################# Loading object to memory ###################
+        input <- get_file_from_s3(s3_file_path = s3_input_path,
+                                  local_file_name = "input.RDS")
+        #######################################################################
+        if (dataset$type == "TMT") {
+          try({
+            open_ms_converter = MSstatsTMT::OpenMStoMSstatsTMTFormat(
+              input,rmPSM_withfewMea_withinRun = remove_few,
+              rmProtein_with1Feature = remove_single_feature)})
+        } else {
+          try({
+            open_ms_converter = MSstatsdev::OpenMStoMSstatsFormat(
+              input, rmPSM_withfewMea_withinRun = remove_few,
+              rmProtein_with1Feature = remove_single_feature)})
+        }
+        master_results <- run_dataprocess(data=open_ms_converter,
+                                          dataset_path=s3_input_path,
+                                          master_result_df=master_results,
+                                          mb_impute=is_impute,
+                                          censored_int="NA")
+      } else {
+        #######################################################################
+        ################# constructing dataset paths on s3 ###################
+        s3_input_data_path <- gsub(path_to_datasets, "", paste0(
+          datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
+            ".", "", dataset$input_path))))
+        s3_annotation_path = gsub(path_to_datasets, "", paste0(
+          datasets$processed_data, gsub("tsv|csv|xls|txt", "RDS", sub(
+            ".", "",dataset$annotation_path))))
+        ################# Loading object to memory ###################
+        input <- get_file_from_s3(s3_file_path = s3_input_data_path,
+                                  local_file_name = "input.RDS")
+        annotation <- get_file_from_s3(s3_file_path = s3_annotation_path,
+                                       local_file_name = "annotation.RDS")
+        input = as.data.frame(input)
+        annotation = as.data.frame(annotation)
+        #######################################################################
+
+        if (dataset$tool == "PD") {
+          if (dataset$type == "TMT") {
+            pd_converter = MSstatsTMT::PDtoMSstatsTMTFormat(
+              input, annotation, rmPSM_withfewMea_withinRun = remove_few,
+              rmProtein_with1Feature = remove_single_feature)
+          } else {
+            pd_converter = MSstatsdev::PDtoMSstatsFormat(
+              input, annotation,removeProtein_with1Peptide = remove_single_feature,
+              fewMeasurements = remove_few_lf)
+          }
+          master_results <- run_dataprocess(
+            data=pd_converter, dataset_path=s3_input_data_path,
+            master_result_df=master_results,
+            mb_impute=is_impute, censored_int="0")
+        }
+        if (dataset$tool == "OpenSWATH") {
+          os_converter = MSstatsdev::OpenSWATHtoMSstatsFormat(
+            input, annotation,removeProtein_with1Feature = remove_single_feature,
+            fewMeasurements = remove_few_lf)
+          master_results <- run_dataprocess(
+            data=os_converter, dataset_path=s3_input_data_path,
+            master_result_df=master_results,
+            mb_impute=is_impute,censored_int="0")
+        }
+        if (dataset$tool == "Progenesis") {
+          progenesis_converter = MSstatsdev::ProgenesistoMSstatsFormat(
+            input, annotation,
+            removeProtein_with1Peptide = remove_single_feature,
+            fewMeasurements = remove_few_lf)
+          master_results <- run_dataprocess(
+            data=progenesis_converter, dataset_path=s3_input_data_path,
+            master_result_df=master_results,
+            mb_impute=is_impute,censored_int="0")
+        }
+        if (dataset$tool == "Skyline") {
+          skyline_converter = MSstatsdev::SkylinetoMSstatsFormat(
+            input, annotation,removeProtein_with1Feature = remove_single_feature,
+            fewMeasurements = remove_few_lf)
+          master_results <- run_dataprocess(
+            data=skyline_converter, dataset_path=s3_input_data_path,
+            master_result_df=master_results,
+            mb_impute=is_impute,censored_int="0")
+        }
+        if (dataset$tool == "SpectroMine") {
+          spectromine_converter = MSstatsTMT::SpectroMinetoMSstatsTMTFormat(
+            input, annotation, rmPSM_withfewMea_withinRun = remove_few,
+            rmProtein_with1Feature = remove_single_feature)
+          master_results <- run_dataprocess(
+            data=spectromine_converter, dataset_path=s3_input_data_path,
+            master_result_df=master_results,
+            mb_impute=is_impute,censored_int="0")
+        }
+        if (dataset$tool == "Spectronaut") {
+          spectronaut_converter = MSstatsdev::SpectronauttoMSstatsFormat(
+            input, annotation,removeProtein_with1Feature = remove_single_feature,
+            fewMeasurements = remove_few_lf)
+          master_results <- run_dataprocess(
+            data=spectronaut_converter, dataset_path=s3_input_data_path,
+            master_result_df=master_results,
+            mb_impute=is_impute,censored_int="0")
+        }
+      }
     }, error = function(e) {
       problems <<- c(problems, dataset$folder_path)
       print(e)
@@ -289,7 +295,6 @@ run_wider_testing <- function(metadata,
 problems = list()
 result_df <-run_wider_testing(metadata_s3)
 
-store_rds(result_df, "local.RDS", "code-deploy-results/temp.RDS")
 #uploading the results to s3 as csv
 store_csv_file_to_s3(s3_path = results$code_deploy_results,
                      local_file_name = "report.xlsx", upload_file=result_df)

@@ -1,85 +1,74 @@
-invoke_dataprocess_non_parameterized<-function(input_file, 
-                                               summary_method="linear", 
-                                               mb_impute=FALSE,
-                                               censored_int="0"){
+invoke_dataprocess_feature_subset_all<-function(input_file, 
+                                                summary_method="TMP", 
+                                                mb_impute=FALSE,
+                                                censored_int="0",
+                                                feature_subset="all"){
+  #
   #against stable version
   output_stable = MSstats::dataProcess(as.data.frame(unclass(input_file)), 
                                        summaryMethod=summary_method, 
                                        MBimpute=mb_impute, 
-                                       censoredInt=censored_int)
+                                       censoredInt=censored_int,
+                                       featureSubset = feature_subset)
   #against dev version
   output_dev = MSstatsdev::dataProcess(input_file, 
                                        summaryMethod=summary_method, 
                                        MBimpute=mb_impute, 
-                                       censoredInt=censored_int)
+                                       censoredInt=censored_int,
+                                       featureSubset = feature_subset)
   return(list(stable=output_stable, dev=output_dev))
 }
 
-invoke_dataprocess_feature_subset<-function(input_file, 
-                                            summary_method="linear", 
-                                            mb_impute=FALSE,
-                                            censored_int="0",
-                                            n_top_feature=5){
-  # `featureSubset` argument parameterized data process function
-  # n_top_feature is defaulted to 5
+invoke_dataprocess_feature_subset_topn<-function(input_file, 
+                                                 summary_method="TMP", 
+                                                 mb_impute=FALSE,
+                                                 censored_int="0",
+                                                 feature_subset="topN",
+                                                 n_top_feature=5){
+  # data process function parameterized on 'featureSubset' argument to 'topN' 
+  # and 'n_top_feature' is defaulted to 5
   #against stable version
   output_stable = MSstats::dataProcess(as.data.frame(unclass(input_file)), 
                                        summaryMethod=summary_method, 
                                        MBimpute=mb_impute, 
                                        censoredInt=censored_int,
                                        n_top_feature = n_top_feature,
-                                       featureSubset = "topN")
+                                       featureSubset = feature_subset)
   #against dev version
   output_dev = MSstatsdev::dataProcess(input_file, 
                                        summaryMethod=summary_method, 
                                        MBimpute=mb_impute, 
                                        censoredInt=censored_int,
                                        n_top_feature = n_top_feature,
-                                       featureSubset = "topN")
+                                       featureSubset = feature_subset)
   return(list(stable=output_stable, dev=output_dev))
 }
 
-invoke_dataprocess_feature_subset_outlier<-function(input_file, 
-                                                    summary_method="linear", 
-                                                    mb_impute=FALSE,
-                                                    censored_int="0",
-                                                    remove_uninformative_feature_outlier=TRUE){
-  # `featureSubset` argument parameterized data process function
-  # n_top_feature is defaulted to 5
+invoke_dataprocess_feature_subset_high_quality<-function(input_file, 
+                                                         summary_method="TMP", 
+                                                         mb_impute=FALSE, 
+                                                         censored_int="0",
+                                                         feature_subset = "highQuality",
+                                                         remove_uninformative_feature_outlier=TRUE){
+  # dataprocess function parameterized on 'featureSubset' argument to 'highQuality'
+  # remove_uninformative_feature_outlier is defaulted to TRUE
   #against stable version
   output_stable = MSstats::dataProcess(as.data.frame(unclass(input_file)), 
-                                       summaryMethod=summary_method, 
+                                       summaryMethod=summary_method,
                                        MBimpute=mb_impute, 
                                        censoredInt=censored_int,
-                                       remove_uninformative_feature_outlier = remove_uninformative_feature_outlier,
-                                       featureSubset = "highQuality")
+                                       featureSubset = feature_subset,
+                                       remove_uninformative_feature_outlier=remove_uninformative_feature_outlier)
   #against dev version
   output_dev = MSstatsdev::dataProcess(input_file, 
-                                       summaryMethod=summary_method, 
+                                       summaryMethod=summary_method,
                                        MBimpute=mb_impute, 
                                        censoredInt=censored_int,
-                                       remove_uninformative_feature_outlier = remove_uninformative_feature_outlier,
-                                       featureSubset = "highQuality")
+                                       featureSubset = feature_subset,
+                                       remove_uninformative_feature_outlier=remove_uninformative_feature_outlier)
   return(list(stable=output_stable, dev=output_dev))
 }
 
-invoke_dataprocess_non_parameterized<-function(input_file, 
-                                               summary_method="linear", 
-                                               mb_impute=FALSE,
-                                               censored_int="0"){
-  # parameterized data process function
-  #against stable version
-  output_stable = MSstats::dataProcess(as.data.frame(unclass(input_file)), 
-                                       summaryMethod=summary_method, 
-                                       MBimpute=mb_impute, 
-                                       censoredInt=censored_int)
-  #against dev version
-  output_dev = MSstatsdev::dataProcess(input_file, 
-                                       summaryMethod=summary_method, 
-                                       MBimpute=mb_impute, 
-                                       censoredInt=censored_int)
-  return(list(stable=output_stable, dev=output_dev))
-}
 
 compare_values_processed_data <- function(input_df){
   #this logic is overkilled for now. Need to handle columns more flexibly
@@ -185,10 +174,9 @@ run_comparisons <- function(dataprocess_output, master_df, notes, summary_method
   
   master_df$master_processed_data <-rbind(master_df$master_processed_data, 
                                           processed.report)
-  
   # checking output on runlevel data
-  runlevel_data_v3 <- as.data.table(dataprocess_output_v3$RunlevelData)
-  runlevel_data_v4 = as.data.table(dataprocess_output_v4$RunlevelData)
+  runlevel_data_v3 <- dataprocess_output_v3$RunlevelData
+  runlevel_data_v4 = dataprocess_output_v4$RunlevelData
   
   runlevel_data_v3 <- runlevel_data_v3[, -which(colnames(runlevel_data_v3) %in% c('GROUP', 'SUBJECT_NESTED', 'SUBJECT'))]
   
