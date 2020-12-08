@@ -14,4 +14,4 @@ if (!requireNamespace("xlsx", quietly = TRUE))
 
 BiocManager::install("MSstats")
 devtools::install_github("Vitek-Lab/MSstats-dev", ref = "refactoring")
-devtools::install_github("Vitek-Lab/MSstatsTMT", ref = "master")
+devtools::install_github("Vitek-Lab/MSstatsTMT", ref = "refactoring")

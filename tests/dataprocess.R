@@ -71,7 +71,7 @@ run_dataprocess <- function(data,
   ############### parameterized dataprocess run 5#########################
   # summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='topN'
   linear_feature_sub_all_dataprocess_output_topn <- invoke_dataprocess_feature_subset_topn(
-    data, summary_method="TMP", mb_impute, censored_int, feature_subset="topN",n_top_feature=5)
+    data, summary_method="linear", mb_impute, censored_int, feature_subset="topN",n_top_feature=5)
   master_result_df <- run_comparisons(linear_feature_sub_all_dataprocess_output_topn, master_df=master_result_df,
                                       notes = "parameterized on remove_uninformative_feature_outlier = FALSE",
                                       summary_method="linear", dataset_path)
@@ -121,7 +121,7 @@ run_wider_testing <- function(metadata,
         #######################################################################
         if (dataset$type == "TMT"){
           try({
-            max_quant_conv = MSstatsTMT::MaxQtoMSstatsTMTFormat(
+            max_quant_conv = MSstatsTMTdev::MaxQtoMSstatsTMTFormat(
               evidence, protein_groups, annotation,
               rmPSM_withfewMea_withinRun = remove_few,
               rmProtein_with1Feature = remove_single_feature)
@@ -190,7 +190,7 @@ run_wider_testing <- function(metadata,
         #######################################################################
         if (dataset$type == "TMT") {
           try({
-            open_ms_converter = MSstatsTMT::OpenMStoMSstatsTMTFormat(
+            open_ms_converter = MSstatsTMTdev::OpenMStoMSstatsTMTFormat(
               input,rmPSM_withfewMea_withinRun = remove_few,
               rmProtein_with1Feature = remove_single_feature)})
         } else {
@@ -224,7 +224,7 @@ run_wider_testing <- function(metadata,
 
         if (dataset$tool == "PD") {
           if (dataset$type == "TMT") {
-            pd_converter = MSstatsTMT::PDtoMSstatsTMTFormat(
+            pd_converter = MSstatsTMTdev::PDtoMSstatsTMTFormat(
               input, annotation, rmPSM_withfewMea_withinRun = remove_few,
               rmProtein_with1Feature = remove_single_feature)
           } else {
@@ -266,7 +266,7 @@ run_wider_testing <- function(metadata,
             mb_impute=is_impute,censored_int="0")
         }
         if (dataset$tool == "SpectroMine") {
-          spectromine_converter = MSstatsTMT::SpectroMinetoMSstatsTMTFormat(
+          spectromine_converter = MSstatsTMTdev::SpectroMinetoMSstatsTMTFormat(
             input, annotation, rmPSM_withfewMea_withinRun = remove_few,
             rmProtein_with1Feature = remove_single_feature)
           master_results <- run_dataprocess(

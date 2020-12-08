@@ -146,11 +146,12 @@ run_comparisons <- function(dataprocess_output, master_df, notes, summary_method
     new_names = c('GROUP', 'SUBJECT'))
   
   #merge two dataframes
-  compare_processed <- merge_dataframes(
-    df1 = processed_data_v3, 
-    df2 = processed_data_v4,
-    col_names = c("GROUP", "SUBJECT", "INTENSITY", "ABUNDANCE", "censored", 
-                  'predicted', 'remove', 'feature_quality', 'is_outlier'))
+  compare_processed <- merge(
+    processed_data_v3, processed_data_v4, by = setdiff(
+      colnames(processed_data_v3),c("GROUP", "SUBJECT", "INTENSITY", "ABUNDANCE", 
+                                    "censored", 'predicted', 'remove', 
+                                    'feature_quality', 'is_outlier')),
+    all.x = T, all.y = T)
   
   
   ## flag the difference : TRUE - matched, FALSE - issue
@@ -175,19 +176,16 @@ run_comparisons <- function(dataprocess_output, master_df, notes, summary_method
   master_df$master_processed_data <-rbind(master_df$master_processed_data, 
                                           processed.report)
   # checking output on runlevel data
-  runlevel_data_v3 <- dataprocess_output_v3$RunlevelData
-  runlevel_data_v4 = dataprocess_output_v4$RunlevelData
+  runlevel_data_v3 <- as.data.table(dataprocess_output_v3$RunlevelData)
+  runlevel_data_v4 = as.data.table(dataprocess_output_v4$RunlevelData)
   
-  runlevel_data_v3 <- runlevel_data_v3[, -which(colnames(runlevel_data_v3) %in% c('GROUP', 'SUBJECT_NESTED', 'SUBJECT'))]
-  
-  runlevel_data_v4 <- as.data.table(runlevel_data_v4)
+  runlevel_data_v3[, which(colnames(runlevel_data_v3) %in% c('GROUP', 'SUBJECT_NESTED', 'SUBJECT')):=NULL]
   runlevel_data_v4[, GROUP := as.factor(as.character(GROUP))]
   runlevel_data_v4[, SUBJECT := as.factor(as.character(SUBJECT))]
   
-  summarized_runlevel = merge_dataframes(
-    df1 = runlevel_data_v3,
-    df2 = runlevel_data_v4,
-    col_names = c("RUN", "Protein")
+  summarized_runlevel <- merge(
+    runlevel_data_v3, runlevel_data_v4, by = c("RUN", "Protein"),
+    all.x = T, all.y = T
   )
   
   ## flag the difference : TRUE - matched, FALSE - issue
