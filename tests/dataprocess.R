@@ -35,6 +35,7 @@ run_dataprocess <- function(data,
                                       notes="summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='All'",
                                       summary_method="TMP", dataset_path)
   print("summaryMethod='TMP' + MBimpute=T or F + censoredInt= 'NA' or '0' + featureSub='All'")
+  print(dataset_path)
   
   ############### parameterized dataprocess run 2 #########################
   # summaryMethod='TMP' + MBimpute=T + censoredInt= 'NA' or '0' + featureSub='topN' + n_top_feature=5
@@ -47,9 +48,10 @@ run_dataprocess <- function(data,
                                       notes = "summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='topN' + n_top_feature=5",
                                       summary_method="TMP", dataset_path)
   print("summaryMethod='TMP' + MBimpute=T + censoredInt= 'NA' or '0' + featureSub='topN' + n_top_feature=5")
-
-  ############### parameterized dataprocess run 3#########################
-  # summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='highQuality' + remove_uninformative_feature_outlier = T/ F
+  print(master_result_df)
+  # 
+  # ############### parameterized dataprocess run 3#########################
+  # # summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='highQuality' + remove_uninformative_feature_outlier = T/ F
   hq_dataprocess_output <- invoke_dataprocess_feature_subset_high_quality(
     data, summary_method="TMP", mb_impute, censored_int,
     feature_subset = "highQuality",
@@ -58,25 +60,30 @@ run_dataprocess <- function(data,
                                       notes = "summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='highQuality' + remove_uninformative_feature_outlier = T/ F",
                                       summary_method="TMP", dataset_path)
   print("summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='highQuality' + remove_uninformative_feature_outlier = T/ F")
-
-  ############### parameterized dataprocess run 4#########################
+  print(master_result_df)
+  # 
+  # ############### parameterized dataprocess run 4#########################
   # summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='All'
   linear_feature_sub_all_dataprocess_output <- invoke_dataprocess_feature_subset_all(
-    data, summary_method="linear", mb_impute, censored_int, feature_subset="All")
+    data, summary_method="linear", mb_impute, censored_int, feature_subset="all")
   master_result_df <- run_comparisons(linear_feature_sub_all_dataprocess_output, master_df=master_result_df,
                                       notes = "summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='All'",
                                       summary_method="linear", dataset_path)
   print("summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='All'")
-
-  ############### parameterized dataprocess run 5#########################
-  # summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='topN'
+  print(dataset_path)
+  # print(master_result_df)
+  # 
+  # ############### parameterized dataprocess run 5#########################
+  # # summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='topN'
   linear_feature_sub_all_dataprocess_output_topn <- invoke_dataprocess_feature_subset_topn(
-    data, summary_method="linear", mb_impute, censored_int, feature_subset="topN",n_top_feature=5)
+    data, summary_method="TMP", mb_impute, censored_int, feature_subset="topN",n_top_feature=5)
   master_result_df <- run_comparisons(linear_feature_sub_all_dataprocess_output_topn, master_df=master_result_df,
                                       notes = "parameterized on remove_uninformative_feature_outlier = FALSE",
                                       summary_method="linear", dataset_path)
   print("summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='topN'")
-  
+  print(master_result_df)
+
+
   return(master_result_df)
 }
 ################################################################################
@@ -130,8 +137,8 @@ run_wider_testing <- function(metadata,
           try({
             max_quant_conv = MSstatsdev::MaxQtoMSstatsFormat(
               evidence, annotation, protein_groups,
-              rmPSM_withfewMea_withinRun = remove_few,
-              rmProtein_with1Feature = remove_single_feature)
+              removeProtein_with1Peptide = remove_single_feature,
+              fewMeasurements = remove_few_lf)
           })
         }
         try({
@@ -140,9 +147,9 @@ run_wider_testing <- function(metadata,
                                             master_result_df = master_results, 
                                             mb_impute=TRUE,
                                             censored_int="NA")
+          print(master_results)
         })
-      } 
-      else if (dataset$tool == "DIAUmpire") {
+      } else if (dataset$tool == "DIAUmpire") {
         #######################################################################
         ################# constructing dataset paths on s3 ###################
         s3_fragment_path <- gsub(path_to_datasets, "", paste0(
@@ -178,7 +185,8 @@ run_wider_testing <- function(metadata,
                                             mb_impute=is_impute,
                                             censored_int="NA")
         })
-      }else if (dataset$tool == "OpenMS") {
+      }
+      else if (dataset$tool == "OpenMS") {
         #######################################################################
         ################# constructing dataset paths on s3 ###################
         s3_input_path = gsub(path_to_datasets, "", paste0(
@@ -196,8 +204,8 @@ run_wider_testing <- function(metadata,
         } else {
           try({
             open_ms_converter = MSstatsdev::OpenMStoMSstatsFormat(
-              input, rmPSM_withfewMea_withinRun = remove_few,
-              rmProtein_with1Feature = remove_single_feature)})
+              input, removeProtein_with1Feature = remove_single_feature,
+              fewMeasurements = remove_few_lf)})
         }
         master_results <- run_dataprocess(data=open_ms_converter,
                                           dataset_path=s3_input_path,
@@ -235,7 +243,7 @@ run_wider_testing <- function(metadata,
           master_results <- run_dataprocess(
             data=pd_converter, dataset_path=s3_input_data_path,
             master_result_df=master_results,
-            mb_impute=is_impute, censored_int="0")
+            mb_impute=is_impute, censored_int="NA")
         }
         if (dataset$tool == "OpenSWATH") {
           os_converter = MSstatsdev::OpenSWATHtoMSstatsFormat(
