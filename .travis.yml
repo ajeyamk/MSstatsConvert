@@ -11,6 +11,7 @@ after_success:
 branches:
   only: 
     - master
+    - develop
 script:
   - zip -r latest *
   - mkdir -p deployment
