@@ -11,9 +11,13 @@ merge_dataframes <- function(df1, df2, col_names){
                all.x = T, all.y = T))
 }
 
-generate_xlsx <- function(dataframes, file_name){
-  write.xlsx(dataframes$master_processed_data, file=file_name, 
-             sheetName=dataframes$data_type, row.names=FALSE)
-  write.xlsx(dataframes$master_run_level_data, file=file_name, 
-             sheetName=dataframes$data_type, append=TRUE, row.names=FALSE)
+generate_success_xlsx <- function(success_df, file_name){
+  write.xlsx(success_df$master_processed_data, file=file_name, 
+             sheetName=success_df$data_type, row.names=FALSE)
+  write.xlsx(success_df$master_run_level_data, file=file_name, 
+             sheetName=success_df$data_type, append=TRUE, row.names=FALSE)
+}
+
+generate_error_xlsx <- function(err_df, file_name){
+  write.xlsx(err_df, file=file_name, sheetName="exceptions", row.names=FALSE)
 }

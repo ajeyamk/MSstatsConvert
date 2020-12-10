@@ -1,24 +1,27 @@
+######################### PARAMTERIZED-1 #######################################
 invoke_dataprocess_feature_subset_all<-function(input_file, 
                                                 summary_method="TMP", 
                                                 mb_impute=FALSE,
                                                 censored_int="0",
-                                                feature_subset="all"){
-  #
+                                                feature_subset="all", 
+                                                exceptions,
+                                                dataset_folder){
+  
   #against stable version
   output_stable = MSstats::dataProcess(as.data.frame(unclass(input_file)), 
                                        summaryMethod=summary_method, 
                                        MBimpute=mb_impute, 
                                        censoredInt=censored_int,
                                        featureSubset = feature_subset)
-  #against dev version
-  output_dev = MSstatsdev::dataProcess(input_file, 
-                                       summaryMethod=summary_method, 
-                                       MBimpute=mb_impute, 
+  # against dev version
+  output_dev = MSstatsdev::dataProcess(input_file,
+                                       summaryMethod=summary_method,
+                                       MBimpute=mb_impute,
                                        censoredInt=censored_int,
                                        featureSubset = feature_subset)
   return(list(stable=output_stable, dev=output_dev))
 }
-
+######################### PARAMTERIZED-2 #######################################
 invoke_dataprocess_feature_subset_topn<-function(input_file, 
                                                  summary_method="TMP", 
                                                  mb_impute=FALSE,
@@ -43,7 +46,7 @@ invoke_dataprocess_feature_subset_topn<-function(input_file,
                                        featureSubset = feature_subset)
   return(list(stable=output_stable, dev=output_dev))
 }
-
+######################### PARAMTERIZED-3 #######################################
 invoke_dataprocess_feature_subset_high_quality<-function(input_file, 
                                                          summary_method="TMP", 
                                                          mb_impute=FALSE, 
@@ -129,7 +132,8 @@ handle_na_values_runlevel_data <- function(input_df){
   return(input_df)
 }
 
-run_comparisons <- function(dataprocess_output, master_df, notes, summary_method, dataset_path){
+run_comparisons <- function(dataprocess_output, master_df, notes, summary_method, 
+                            dataset_path){
   dataprocess_output_v3 <- dataprocess_output$stable
   dataprocess_output_v4 <- dataprocess_output$dev
   
@@ -138,8 +142,7 @@ run_comparisons <- function(dataprocess_output, master_df, notes, summary_method
   processed_data_v4 <- as.data.table(dataprocess_output_v4$ProcessedData)
   
   #check columns that have null values
-  processed_data_v3[, which(colnames(
-    processed_data_v3) %in% c('GROUP', 'SUBJECT_NESTED', 'SUBJECT')):=NULL]
+  processed_data_v3[, which(colnames(processed_data_v3) %in% c('GROUP', 'SUBJECT_NESTED', 'SUBJECT')):=NULL]
   #rename data frame column names
   processed_data_v3 <- rename_column(
     processed_data_v3, old_names = c('GROUP_ORIGINAL', 'SUBJECT_ORIGINAL'), 
@@ -152,7 +155,6 @@ run_comparisons <- function(dataprocess_output, master_df, notes, summary_method
                                     "censored", 'predicted', 'remove', 
                                     'feature_quality', 'is_outlier')),
     all.x = T, all.y = T)
-  
   
   ## flag the difference : TRUE - matched, FALSE - issue
   compare_processed <- compare_values_processed_data(compare_processed)
@@ -172,7 +174,6 @@ run_comparisons <- function(dataprocess_output, master_df, notes, summary_method
     is_outlier = sum(!compare_processed$match.otr),
     s3_dataset_path = dataset_path
   )
-  
   master_df$master_processed_data <-rbind(master_df$master_processed_data, 
                                           processed.report)
   # checking output on runlevel data
@@ -180,6 +181,7 @@ run_comparisons <- function(dataprocess_output, master_df, notes, summary_method
   runlevel_data_v4 = as.data.table(dataprocess_output_v4$RunlevelData)
   
   runlevel_data_v3[, which(colnames(runlevel_data_v3) %in% c('GROUP', 'SUBJECT_NESTED', 'SUBJECT')):=NULL]
+  
   runlevel_data_v4[, GROUP := as.factor(as.character(GROUP))]
   runlevel_data_v4[, SUBJECT := as.factor(as.character(SUBJECT))]
   

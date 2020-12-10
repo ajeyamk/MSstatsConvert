@@ -45,11 +45,15 @@ get_file_from_s3 <- function(s3_file_path, local_file_name){
   return(read_bin_files_s3(s3_stream_file$Body, local_file_name))
 }
 
-store_csv_file_to_s3 <- function(s3_path, local_file_name, upload_file){
+store_csv_file_to_s3 <- function(s3_path, local_file_name, upload_file, is_error){
   #helper function to upload csv to s3
   print("uploading results to s3...")
   s3_file_path <- generate_s3_path(s3_path)
-  generate_xlsx(upload_file, local_file_name)
+  if(is_error){
+    generate_error_xlsx(upload_file, local_file_name)
+  }else{
+    generate_success_xlsx(upload_file, local_file_name) 
+  }
   # write.csv(upload_file, file=local_file_name)
   s3$put_object(
     Body = write_bin_files_s3(local_file_name, local_file_name, is_rds = FALSE), 
