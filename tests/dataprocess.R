@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
-
-library(data.table)
+library(MSstatsTMTdev)
+library(MSstatsdev)
 
 source("/home/rstudio/code/deployment/tests/utils/s3_helper_functions.R")
 source("/home/rstudio/code/deployment/tests/utils/dataprocess_helper_functions.R")
@@ -35,7 +35,7 @@ run_dataprocess <- function(data,
                                       summary_method="TMP", dataset_path)
   
   # ############### parameterized dataprocess run 2 #########################
-  # # summaryMethod='TMP' + MBimpute=T + censoredInt= 'NA' or '0' + featureSub='topN' + n_top_feature=5
+  # summaryMethod='TMP' + MBimpute=T + censoredInt= 'NA' or '0' + featureSub='topN' + n_top_feature=5
   top_n_dataprocess_output <-invoke_dataprocess_feature_subset_topn(data, summary_method="TMP",
                                                                     mb_impute,
                                                                     censored_int,
@@ -44,7 +44,7 @@ run_dataprocess <- function(data,
   master_result_df <- run_comparisons(top_n_dataprocess_output, master_df=master_result_df,
                                       notes = "summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='topN' + n_top_feature=5",
                                       summary_method="TMP", dataset_path)
-  
+
   # # ############### parameterized dataprocess run 3#########################
   # # # summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='highQuality' + remove_uninformative_feature_outlier = T/ F
   hq_dataprocess_output <- invoke_dataprocess_feature_subset_high_quality(
@@ -54,7 +54,7 @@ run_dataprocess <- function(data,
   master_result_df <- run_comparisons(hq_dataprocess_output, master_df=master_result_df,
                                       notes = "summaryMethod='TMP' + MBimpute=T/F + censoredInt= 'NA'/'0' + featureSub='highQuality' + remove_uninformative_feature_outlier = T/ F",
                                       summary_method="TMP", dataset_path)
-  
+
   # ############### parameterized dataprocess run 4#########################
   # summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='All'
   linear_feature_sub_all_dataprocess_output <- invoke_dataprocess_feature_subset_all(
@@ -63,7 +63,7 @@ run_dataprocess <- function(data,
                                       master_df=master_result_df,
                                       notes = "summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='All'",
                                       summary_method="linear", dataset_path)
-  
+
   # ############### parameterized dataprocess run 5#########################
   # # summaryMethod='Linear' + MBimpute=F + censoredInt= 'NA' or '0' + featureSub='topN'
   linear_feature_sub_all_dataprocess_output_topn <- invoke_dataprocess_feature_subset_topn(
@@ -130,6 +130,7 @@ run_wider_testing <- function(metadata,
                                           master_result_df = master_results, 
                                           mb_impute=F,
                                           censored_int="NA")
+        gc()
       } else if (dataset$tool == "DIAUmpire") {
         #######################################################################
         ################# constructing dataset paths on s3 ###################
@@ -166,6 +167,7 @@ run_wider_testing <- function(metadata,
                                             mb_impute=F,
                                             censored_int="NA")
         })
+        gc()
       }
       else if (dataset$tool == "OpenMS") {
         #######################################################################
@@ -193,6 +195,7 @@ run_wider_testing <- function(metadata,
                                           master_result_df=master_results,
                                           mb_impute=F,
                                           censored_int="NA")
+        gc()
       } else {
         #######################################################################
         ################# constructing dataset paths on s3 ###################
@@ -225,6 +228,7 @@ run_wider_testing <- function(metadata,
             data=pd_converter, dataset_path=s3_input_data_path,
             master_result_df=master_results,
             mb_impute=F, censored_int="NA")
+          gc()
         }
         if (dataset$tool == "OpenSWATH") {
           os_converter = MSstatsdev::OpenSWATHtoMSstatsFormat(
@@ -234,6 +238,7 @@ run_wider_testing <- function(metadata,
             data=os_converter, dataset_path=s3_input_data_path,
             master_result_df=master_results,
             mb_impute=F,censored_int="0")
+          gc()
         }
         if (dataset$tool == "Progenesis") {
           progenesis_converter = MSstatsdev::ProgenesistoMSstatsFormat(
@@ -244,6 +249,7 @@ run_wider_testing <- function(metadata,
             data=progenesis_converter, dataset_path=s3_input_data_path,
             master_result_df=master_results,
             mb_impute=F,censored_int="0")
+          gc()
         }
         if (dataset$tool == "Skyline") {
           skyline_converter = MSstatsdev::SkylinetoMSstatsFormat(
@@ -253,6 +259,7 @@ run_wider_testing <- function(metadata,
             data=skyline_converter, dataset_path=s3_input_data_path,
             master_result_df=master_results,
             mb_impute=F,censored_int="0")
+          gc()
         }
         if (dataset$tool == "SpectroMine") {
           spectromine_converter = MSstatsTMTdev::SpectroMinetoMSstatsTMTFormat(
@@ -262,6 +269,7 @@ run_wider_testing <- function(metadata,
             data=spectromine_converter, dataset_path=s3_input_data_path,
             master_result_df=master_results,
             mb_impute=F,censored_int="0")
+          gc()
         }
         if (dataset$tool == "Spectronaut") {
           spectronaut_converter = MSstatsdev::SpectronauttoMSstatsFormat(
@@ -271,6 +279,7 @@ run_wider_testing <- function(metadata,
             data=spectronaut_converter, dataset_path=s3_input_data_path,
             master_result_df=master_results,
             mb_impute=F,censored_int="0")
+          gc()
         }
       }
     }, error = function(e) {
@@ -297,6 +306,7 @@ if (is_error){
   file_to_s3 <- result_df
 }
 
+store_rds(file_to_s3, "temp.RDS", results$code_deploy_results)
 #uploading the results to s3 as csv
 store_csv_file_to_s3(s3_path = results$code_deploy_results,
                      local_file_name = "report.xlsx", upload_file=file_to_s3, is_error)

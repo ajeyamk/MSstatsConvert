@@ -1,4 +1,3 @@
-library(data.table)
 library(xlsx)
 
 rename_column <- function(df, old_names, new_names){
